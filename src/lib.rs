@@ -1,30 +1,20 @@
 #![forbid(unsafe_code)]
 #![doc = include_str!("../README.md")]
-//!
-//! ```rust
-//! use glide_rs::Client;
-//!
-//! let client = Client::new();
-//! ```
-//!
 
 pub use client::Client;
 
 mod client;
-mod providers;
 mod config;
-
-pub mod services {
-    //! `EinStack` API services.
-
-    pub use super::providers::Anthropic;
-}
+pub mod service;
 
 pub mod types {
     //! Request and response types.
-
-
 }
+
+/// Errors that may occur during the processing of the API request.
+#[derive(Debug, thiserror::Error)]
+#[error("unknown")]
+pub struct ErrorResponse {}
 
 /// Error type for operations of a [`Client`].
 #[derive(Debug, thiserror::Error)]
@@ -35,7 +25,7 @@ pub enum Error {
 
     /// Errors that may occur during the processing of the API request.
     #[error("glide error: {0}")]
-    Glide(#[from] types::GlideError),
+    Glide(#[from] ErrorResponse),
 }
 
 /// Specialized [`Result`] type for an [`Error`].

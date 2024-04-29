@@ -10,7 +10,7 @@ readme = "./README.md"
 
 authors = ["EinStack <contact@einstack.ai>"]
 repository = "https://github.com/EinStack/glide-rs"
-homepage = "https://github.com/EinStack/glide-rs"
+homepage = "https://www.einstack.ai/"
 documentation = "https://docs.rs/glide-rs"
 
 categories = ["web-programming"]
@@ -29,3 +29,7 @@ rustls-tls = ["reqwest/rustls-tls"]
 reqwest = { version = "0.12.4", default-features = false, features = ["json"] }
 serde = { version = "1.0.199", features = ["derive"] }
 thiserror = { version = "1.0.59" }
+serde_json = "1.0.116"
+
+[dev-dependencies]
+tokio = { version = "1.37.0", features = ["macros", "test-util", "rt-multi-thread"] }

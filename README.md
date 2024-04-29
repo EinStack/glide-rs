@@ -23,7 +23,7 @@
 
 Coming soon
 
-```
+```cmd
 cargo add glide-rs
 ```
 
