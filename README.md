@@ -16,11 +16,16 @@
 
 ## Features
 
-TBU
+- `native-tls` to use system-native TLS. **Enabled by default**.
+- `rustls-tls` to use TLS backed by rustls .
 
 ## Installation
 
 Coming soon
+
+```
+cargo add glide-rs
+```
 
 ## Usage
 

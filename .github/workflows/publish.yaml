@@ -1,0 +1,30 @@
+name: Publish
+
+on:
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Use cached dependencies
+        uses: Swatinem/rust-cache@v2
+
+      - name: Semver
+        run: |
+          cargo install cargo-semver-checks --locked
+          cargo semver-checks check-release
+
+      - name: Publish
+        run: cargo publish --token ${CRATES_TOKEN}
+        env:
+          CRATES_TOKEN: ${{ secrets.CRATES_TOKEN }}

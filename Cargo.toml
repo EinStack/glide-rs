@@ -1,12 +1,31 @@
+# https://doc.rust-lang.org/cargo/reference/manifest.html
+
 [package]
 name = "glide-rs"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+license = "Apache-2.0"
+readme = "./README.md"
 
-[dependencies]
+authors = ["EinStack <contact@einstack.ai>"]
+repository = "https://github.com/EinStack/glide-rs"
+homepage = "https://github.com/EinStack/glide-rs"
+documentation = "https://docs.rs/glide-rs"
+
+categories = ["web-programming"]
+keywords = []
+description = "A minimal EinStack client."
 
 [lib]
-name = "glide-rs"
-path = "src/main.rs"
+path = "src/lib.rs"
+
+[features]
+default = ["native-tsl"]
+native-tsl = ["reqwest/native-tls"]
+rustls-tls = ["reqwest/rustls-tls"]
+
+[dependencies]
+reqwest = { version = "0.12.4", default-features = false, features = ["json"] }
+serde = { version = "1.0.199", features = ["derive"] }
+thiserror = { version = "1.0.59" }
