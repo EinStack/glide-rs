@@ -6,7 +6,6 @@ use reqwest::{Client, Method, RequestBuilder, Response, Url};
 use crate::{Error, Result, SvcError};
 
 pub struct Config {
-    pub(crate) api_key: String,
     pub(crate) user_agent: String,
     pub(crate) base_url: Url,
     pub(crate) client: Client,
@@ -14,7 +13,7 @@ pub struct Config {
 
 impl Config {
     /// Creates a new [`Config`].
-    pub fn new(api_key: &str, client: Client) -> Self {
+    pub fn new(client: Client) -> Self {
         let env_base_url = env::var("GLIDE_BASE_URL")
             .map_or_else(
                 |_| Url::parse("http://127.0.0.1:9099"),
@@ -27,7 +26,6 @@ impl Config {
         });
 
         Self {
-            api_key: api_key.to_owned(),
             user_agent: env_user_agent,
             base_url: env_base_url,
             client,
@@ -43,7 +41,6 @@ impl Config {
 
         self.client
             .request(method, path)
-            .bearer_auth(self.api_key.as_str())
             .header(USER_AGENT, self.user_agent.as_str())
     }
 

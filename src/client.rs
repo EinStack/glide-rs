@@ -1,5 +1,5 @@
+use std::fmt;
 use std::sync::Arc;
-use std::{env, fmt};
 
 use reqwest::{Client as ReqwestClient, Method};
 
@@ -20,6 +20,7 @@ use crate::Result;
 /// let _ = client.language.list().await?;
 /// # };
 /// ```
+#[must_use]
 #[derive(Clone)]
 pub struct Client {
     config: Arc<Config>,
@@ -34,9 +35,9 @@ impl Client {
     /// - Panics if the environment variable `GLIDE_BASE_URL` is set but is not a valid `URL`.
     ///
     /// [`EinStack`]: https://www.einstack.ai/
-    pub fn new(api_key: &str) -> Self {
+    pub fn new() -> Self {
         let client = ReqwestClient::new();
-        Self::with_client(api_key, client)
+        Self::with_client(client)
     }
 
     /// Creates a new [`EinStack`] client with a provided [`reqwest::Client`].
@@ -47,19 +48,12 @@ impl Client {
     ///
     /// [`EinStack`]: https://www.einstack.ai/
     /// [`reqwest::Client`]: ReqwestClient
-    pub fn with_client(api_key: &str, client: ReqwestClient) -> Self {
-        let config = Arc::new(Config::new(api_key, client));
+    pub fn with_client(client: ReqwestClient) -> Self {
+        let config = Arc::new(Config::new(client));
         Self {
             language: LanguageSvc(config.clone()),
             config,
         }
-    }
-
-    /// Returns the reference to the provided API key.
-    #[inline]
-    #[must_use]
-    pub fn api_key(&self) -> &str {
-        self.config.api_key.as_ref()
     }
 
     /// Returns the reference to the used `User-Agent` header value.
@@ -113,17 +107,8 @@ impl Client {
 }
 
 impl Default for Client {
-    /// Creates a new [`Client`] from the `GLIDE_API_KEY` environment variable .
-    ///
-    /// ### Panics
-    ///
-    /// - Panics if the environment variable `GLIDE_API_KEY` is not set.
-    /// - Panics if the environment variable `GLIDE_BASE_URL` is set but is not a valid `URL`.
     fn default() -> Self {
-        let api_key = env::var("GLIDE_API_KEY")
-            .expect("env variable `GLIDE_API_KEY` should be a valid API key");
-
-        Self::new(api_key.as_str())
+        Self::new()
     }
 }
 

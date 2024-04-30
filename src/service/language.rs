@@ -97,11 +97,12 @@ pub struct LangModelConfig {
     pub enabled: bool,
     pub weight: Option<i32>,
     pub error_budget: Option<String>,
+
     #[serde(flatten)]
     pub config: ProviderConfig,
 
-    client: Option<ClientsConfig>,
-    latency_config: Option<LatencyConfig>,
+    pub client: Option<ClientsConfig>,
+    pub latency_config: Option<LatencyConfig>,
 }
 
 /// TODO.

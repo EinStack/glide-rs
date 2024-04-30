@@ -11,7 +11,7 @@ pub mod octoml;
 pub mod ollama;
 pub mod openai;
 
-/// TODO.
+/// Config for all available providers.
 #[derive(Debug, Serialize, Deserialize)]
 pub enum Config {
     #[serde(rename = "anthropic")]
