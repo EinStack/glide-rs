@@ -1,19 +1,31 @@
+//! Service providers, configs and params.
+//!
+
 use serde::{Deserialize, Serialize};
 
-pub mod openai;
 pub mod anthropic;
 pub mod ollama;
+pub mod openai;
+pub mod octoml;
+pub mod bedrock;
+pub mod cohere;
+pub mod azureopenai;
 
+/// TODO.
 #[derive(Debug, Serialize, Deserialize)]
-#[serde(untagged)]
 pub enum Config {
+    #[serde(rename = "anthropic")]
     Anthropic(anthropic::AnthropicConfig),
-    // pub azureopenai: Option<Box<models::AzureopenaiPeriodConfig>>,
-    // pub bedrock: Option<Box<models::BedrockPeriodConfig>>,
-    // pub client: Option<Box<models::ClientsPeriodClientConfig>>,
-    // pub cohere: Option<Box<models::CoherePeriodConfig>>,
-    // pub latency: Option<Box<models::LatencyPeriodConfig>>,
-    // pub octoml: Option<Box<models::OctomlPeriodConfig>>,
+    #[serde(rename = "azureopenai")]
+    AzureOpenAi(azureopenai::AzureOpenAiConfig),
+    #[serde(rename = "bedrock")]
+    Bedrock(bedrock::BedrockConfig),
+    #[serde(rename = "cohere")]
+    Cohere(cohere::CohereConfig),
+    #[serde(rename = "octoml")]
+    Octoml(octoml::OctomlConfig),
+    #[serde(rename = "ollama")]
     Ollama(ollama::OllamaConfig),
+    #[serde(rename = "openai")]
     OpenAi(openai::OpenAiConfig),
 }

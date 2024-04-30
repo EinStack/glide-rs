@@ -4,7 +4,7 @@ use std::sync::Arc;
 use reqwest::{Client as ReqwestClient, Method};
 
 use crate::config::Config;
-use crate::language::Language;
+use crate::language::LanguageSvc;
 use crate::Result;
 
 /// A minimal [EinStack](https://einstack.ai/) client.
@@ -13,13 +13,17 @@ use crate::Result;
 ///
 /// ```rust,no_run
 /// use glide_rs::Client;
+/// use glide_rs::language::*;
 ///
-/// let client = Client::new("");
+/// # let _ = async {
+/// let client = Client::default();
+/// let _ = client.language.list().await?;
+/// # };
 /// ```
 #[derive(Clone)]
 pub struct Client {
     config: Arc<Config>,
-    pub language: Language,
+    pub language: LanguageSvc,
 }
 
 impl Client {
@@ -45,7 +49,10 @@ impl Client {
     /// [`reqwest::Client`]: ReqwestClient
     pub fn with_client(api_key: &str, client: ReqwestClient) -> Self {
         let config = Arc::new(Config::new(api_key, client));
-        Self { language: Language(config.clone()), config }
+        Self {
+            language: LanguageSvc(config.clone()),
+            config,
+        }
     }
 
     /// Returns the reference to the provided API key.

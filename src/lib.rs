@@ -6,17 +6,15 @@ pub use service::language;
 
 mod client;
 mod config;
-mod service;
 pub mod provider;
+mod service;
 
-pub mod types {
-    //! Request and response types.
+/// Errors that may occur during the processing of API request.
+#[derive(Debug, thiserror::Error, serde::Deserialize)]
+#[error("resend error: {message}")]
+pub struct SvcError {
+    pub message: String,
 }
-
-/// Errors that may occur during the processing of the API request.
-#[derive(Debug, thiserror::Error)]
-#[error("unknown")]
-pub struct ErrorResponse {}
 
 /// Error type for operations of a [`Client`].
 #[derive(Debug, thiserror::Error)]
@@ -25,9 +23,9 @@ pub enum Error {
     #[error("http error: {0}")]
     Http(#[from] reqwest::Error),
 
-    /// Errors that may occur during the processing of the API request.
+    /// Errors that may occur during the processing of API request.
     #[error("glide error: {0}")]
-    Glide(#[from] ErrorResponse),
+    Glide(#[from] SvcError),
 }
 
 /// Specialized [`Result`] type for an [`Error`].

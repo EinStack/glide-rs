@@ -3,7 +3,7 @@ use std::{env, fmt};
 use reqwest::{Client, Method, RequestBuilder, Response, Url};
 use reqwest::header::USER_AGENT;
 
-use crate::{Error, ErrorResponse, Result};
+use crate::{Error, Result, SvcError};
 
 pub struct Config {
     pub(crate) api_key: String,
@@ -47,17 +47,15 @@ impl Config {
             .header(USER_AGENT, self.user_agent.as_str())
     }
 
-    /// TODO.
+    /// Builds and executes the given [`RequestBuilder`].
     pub async fn send(&self, request: RequestBuilder) -> Result<Response> {
         let request = request.build()?;
         let response = self.client.execute(request).await?;
 
         match response.status() {
             x if x.is_client_error() || x.is_server_error() => {
-                // let error = response.json::<ErrorResponse>().await?;
-
-                // TODO.
-                Err(Error::Glide(ErrorResponse {}))
+                let error = response.json::<SvcError>().await?;
+                Err(Error::Glide(error))
             }
             _ => Ok(response),
         }
