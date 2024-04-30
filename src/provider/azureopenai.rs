@@ -1,3 +1,5 @@
+//! <https://azure.microsoft.com/en-us/products/ai-services/openai-service>
+
 use serde::{Deserialize, Serialize};
 
 /// TODO.

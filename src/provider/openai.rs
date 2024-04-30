@@ -1,3 +1,5 @@
+//! <https://openai.com/>
+
 use serde::{Deserialize, Serialize};
 
 /// TODO.

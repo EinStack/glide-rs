@@ -1,3 +1,5 @@
+//! <https://octo.ai/>
+
 use serde::{Deserialize, Serialize};
 
 /// TODO.

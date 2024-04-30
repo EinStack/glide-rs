@@ -125,7 +125,6 @@ pub struct LatencyConfig {
     pub warmup_samples: Option<i32>,
 }
 
-
 /// TODO.
 #[derive(Debug, Serialize)]
 pub struct ChatRequest {
@@ -255,8 +254,8 @@ pub struct TokenUsage {
 
 #[cfg(test)]
 mod test {
-    use crate::{Client, Result};
     use crate::language::ChatRequest;
+    use crate::{Client, Result};
 
     #[tokio::test]
     async fn list() -> Result<()> {

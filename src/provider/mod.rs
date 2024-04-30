@@ -4,12 +4,12 @@
 use serde::{Deserialize, Serialize};
 
 pub mod anthropic;
-pub mod ollama;
-pub mod openai;
-pub mod octoml;
+pub mod azureopenai;
 pub mod bedrock;
 pub mod cohere;
-pub mod azureopenai;
+pub mod octoml;
+pub mod ollama;
+pub mod openai;
 
 /// TODO.
 #[derive(Debug, Serialize, Deserialize)]

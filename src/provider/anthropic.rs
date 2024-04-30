@@ -1,3 +1,5 @@
+//! <https://anthropic.com/>
+
 use serde::{Deserialize, Serialize};
 
 /// TODO.

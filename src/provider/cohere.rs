@@ -1,3 +1,5 @@
+//! <https://cohere.com/>
+
 use serde::{Deserialize, Serialize};
 
 /// TODO.

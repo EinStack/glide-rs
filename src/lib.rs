@@ -1,5 +1,16 @@
 #![forbid(unsafe_code)]
 #![doc = include_str!("../README.md")]
+//! ## Usage
+//!
+//! ```rust,no_run
+//! use glide_rs::{Client, Result};
+//!
+//! async fn main() -> Result<()> {
+//!     let glide = Client::default();
+//!     let _ = glide.language.list().await?;
+//!     Ok(())
+//! }
+//! ```
 
 pub use client::Client;
 pub use service::language;
@@ -11,7 +22,7 @@ mod service;
 
 /// Errors that may occur during the processing of API request.
 #[derive(Debug, thiserror::Error, serde::Deserialize)]
-#[error("resend error: {message}")]
+#[error("{message}")]
 pub struct SvcError {
     pub message: String,
 }

@@ -1,5 +1,5 @@
-use std::{env, fmt};
 use std::sync::Arc;
+use std::{env, fmt};
 
 use reqwest::{Client as ReqwestClient, Method};
 

@@ -1,7 +1,7 @@
 use std::{env, fmt};
 
-use reqwest::{Client, Method, RequestBuilder, Response, Url};
 use reqwest::header::USER_AGENT;
+use reqwest::{Client, Method, RequestBuilder, Response, Url};
 
 use crate::{Error, Result, SvcError};
 

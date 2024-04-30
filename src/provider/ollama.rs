@@ -1,3 +1,5 @@
+//! <https://ollama.com/>
+
 use serde::{Deserialize, Serialize};
 
 /// TODO.
