@@ -1,17 +1,24 @@
+//! Language service, its request and response types.
+//!
+
 use std::fmt;
 use std::sync::Arc;
 
 use reqwest::Method;
 
+use types::{ChatRequest, ChatResponse};
+
 use crate::config::Config;
 use crate::Result;
 
-/// TODO.
+/// `Glide` APIs for `/v1/language` endpoints.
 #[derive(Clone)]
 pub struct Language(pub(crate) Arc<Config>);
 
 impl Language {
-    /// TODO.
+    /// Retrieves a list of all router configs.
+    ///
+    /// `GET /v1/language`
     pub async fn list(&self) -> Result<Vec<types::RouterConfig>> {
         let request = self.0.build(Method::GET, "/v1/language/");
         let response = self.0.send(request).await?;
@@ -20,10 +27,29 @@ impl Language {
     }
 
     /// TODO.
-    pub async fn chat(&self) -> Result<()> { todo!() }
+    ///
+    /// `POST /v1/language/{router}/chat`
+    pub async fn chat(&self, router: &str, data: ChatRequest) -> Result<ChatResponse> {
+        let path = format!("/v1/language/{router}/chat");
+
+        let request = self.0.build(Method::POST, &path);
+        let response = self.0.send(request.json(&data)).await?;
+        let content = response.json::<ChatResponse>().await?;
+
+        Ok(content)
+    }
 
     /// TODO.
-    pub async fn stream(&self) -> Result<()> { todo!() }
+    ///
+    /// `GET /v1/language/{router}/chatStream`
+    pub async fn stream(&self, router: &str) -> Result<()> {
+        let path = format!("/v1/language/{router}/chatStream");
+
+        // https://crates.io/crates/reqwest-websocket
+        // https://crates.io/crates/tungstenite
+
+        todo!()
+    }
 }
 
 impl fmt::Debug for Language {
@@ -33,6 +59,8 @@ impl fmt::Debug for Language {
 }
 
 pub mod types {
+    use std::collections::HashMap;
+
     use serde::{Deserialize, Serialize};
 
     #[derive(Debug, Deserialize)]
@@ -74,143 +102,102 @@ pub mod types {
         pub weight: Option<i32>,
         pub error_budget: Option<String>,
 
-        pub anthropic: Option<AnthropicConfig>,
+        // pub anthropic: Option<AnthropicConfig>,
         // pub azureopenai: Option<Box<models::AzureopenaiPeriodConfig>>,
         // pub bedrock: Option<Box<models::BedrockPeriodConfig>>,
         // pub client: Option<Box<models::ClientsPeriodClientConfig>>,
         // pub cohere: Option<Box<models::CoherePeriodConfig>>,
         // pub latency: Option<Box<models::LatencyPeriodConfig>>,
         // pub octoml: Option<Box<models::OctomlPeriodConfig>>,
-        pub ollama: Option<OllamaConfig>,
-        pub openai: Option<OpenAiConfig>,
+        // pub ollama: Option<OllamaConfig>,
+        // pub openai: Option<OpenAiConfig>,
+    }
+
+
+    /// TODO.
+    #[derive(Debug, Serialize)]
+    pub struct ChatRequest {
+        #[serde(rename = "message")]
+        pub message: ChatMessage,
+        #[serde(rename = "messageHistory")]
+        pub message_history: Vec<ChatMessage>,
+        #[serde(rename = "override")]
+        pub r#override: Option<ChatMessageOverride>,
+    }
+
+    impl ChatRequest {
+        /// Creates a new [`ChatRequest`].
+        pub fn new() -> Self {
+            todo!()
+        }
+    }
+
+    /// TODO.
+    #[derive(Debug, Serialize)]
+    pub struct ChatMessageOverride {
+        #[serde(rename = "message")]
+        pub message: ChatMessage,
+        #[serde(rename = "model_id")]
+        pub model_id: String,
+    }
+
+    /// TODO.
+    #[derive(Debug, Deserialize)]
+    pub struct ChatResponse {
+        #[serde(rename = "cached", skip_serializing_if = "Option::is_none")]
+        pub cached: Option<bool>,
+        #[serde(rename = "created", skip_serializing_if = "Option::is_none")]
+        pub created: Option<i32>,
+        #[serde(rename = "id", skip_serializing_if = "Option::is_none")]
+        pub id: Option<String>,
+        #[serde(rename = "model", skip_serializing_if = "Option::is_none")]
+        pub model: Option<String>,
+        #[serde(rename = "model_id", skip_serializing_if = "Option::is_none")]
+        pub model_id: Option<String>,
+        #[serde(rename = "modelResponse", skip_serializing_if = "Option::is_none")]
+        pub model_response: Option<ModelResponse>,
+        #[serde(rename = "provider", skip_serializing_if = "Option::is_none")]
+        pub provider: Option<String>,
+        #[serde(rename = "router", skip_serializing_if = "Option::is_none")]
+        pub router: Option<String>,
+    }
+
+    /// TODO.
+    #[derive(Debug, Deserialize)]
+    pub struct ModelResponse {
+        #[serde(rename = "message")]
+        pub message: Option<ChatMessage>,
+        #[serde(rename = "responseId")]
+        pub response_id: Option<HashMap<String, String>>,
+        #[serde(rename = "tokenCount")]
+        pub token_count: Option<TokenUsage>,
     }
 
     /// TODO.
     #[derive(Debug, Serialize, Deserialize)]
-    pub struct AnthropicConfig {
-        #[serde(rename = "apiVersion")]
-        pub api_version: String,
-        #[serde(rename = "baseUrl")]
-        pub base_url: String,
-        #[serde(rename = "chatEndpoint")]
-        pub chat_endpoint: String,
-        #[serde(rename = "defaultParams", skip_serializing_if = "Option::is_none")]
-        pub default_params: Option<AnthropicParams>,
-        #[serde(rename = "model")]
-        pub model: String,
+    pub struct ChatMessage {
+        /// The content of the message.
+        pub content: String,
+        /// The name of the author of this message.
+        ///
+        /// May contain a-z, A-Z, 0-9, and underscores,
+        /// with a maximum length of 64 characters.
+        pub name: Option<String>,
+        /// The role of the author of this message.
+        ///
+        /// One of system, user, or assistant.
+        pub role: String,
     }
 
     /// TODO.
-    #[derive(Debug, Serialize, Deserialize)]
-    pub struct AnthropicParams {
-        #[serde(skip_serializing_if = "Option::is_none")]
-        pub max_tokens: Option<i32>,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        pub metadata: Option<String>,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        pub stop: Option<Vec<String>>,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        pub system: Option<String>,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        pub temperature: Option<f64>,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        pub top_k: Option<i32>,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        pub top_p: Option<f64>,
-    }
-
-    /// TODO.
-    #[derive(Debug, Serialize, Deserialize)]
-    pub struct OllamaConfig {
-        #[serde(rename = "baseUrl")]
-        pub base_url: String,
-        #[serde(rename = "chatEndpoint")]
-        pub chat_endpoint: String,
-        #[serde(rename = "defaultParams", skip_serializing_if = "Option::is_none")]
-        pub default_params: Option<OllamaParams>,
-        #[serde(rename = "model")]
-        pub model: String,
-    }
-
-    /// TODO.
-    #[derive(Debug, Serialize, Deserialize)]
-    pub struct OllamaParams {
-        #[serde(skip_serializing_if = "Option::is_none")]
-        pub microstat: Option<i32>,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        pub microstat_eta: Option<f64>,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        pub microstat_tau: Option<f64>,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        pub num_ctx: Option<i32>,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        pub num_gpu: Option<i32>,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        pub num_gqa: Option<i32>,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        pub num_predict: Option<i32>,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        pub num_thread: Option<i32>,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        pub repeat_last_n: Option<i32>,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        pub seed: Option<i32>,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        pub stop: Option<Vec<String>>,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        pub stream: Option<bool>,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        pub temperature: Option<f64>,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        pub tfs_z: Option<f64>,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        pub top_k: Option<i32>,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        pub top_p: Option<f64>,
-    }
-
-    /// TODO.
-    #[derive(Debug, Serialize, Deserialize)]
-    pub struct OpenAiConfig {
-        #[serde(rename = "baseUrl")]
-        pub base_url: String,
-        #[serde(rename = "chatEndpoint")]
-        pub chat_endpoint: String,
-        #[serde(rename = "defaultParams", skip_serializing_if = "Option::is_none")]
-        pub default_params: Option<OpenAiParams>,
-        #[serde(rename = "model")]
-        pub model: String,
-    }
-
-    /// TODO.
-    #[derive(Debug, Serialize, Deserialize)]
-    pub struct OpenAiParams {
-        #[serde(skip_serializing_if = "Option::is_none")]
-        pub frequency_penalty: Option<i32>,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        pub logit_bias: Option<std::collections::HashMap<String, f64>>,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        pub max_tokens: Option<i32>,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        pub n: Option<i32>,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        pub presence_penalty: Option<i32>,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        pub response_format: Option<serde_json::Value>,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        pub seed: Option<i32>,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        pub stop: Option<Vec<String>>,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        pub temperature: Option<f64>,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        pub tool_choice: Option<serde_json::Value>,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        pub tools: Option<Vec<String>>,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        pub top_p: Option<f64>,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        pub user: Option<String>,
+    #[derive(Debug, Deserialize)]
+    pub struct TokenUsage {
+        #[serde(rename = "promptTokens")]
+        pub prompt_tokens: Option<i32>,
+        #[serde(rename = "responseTokens")]
+        pub response_tokens: Option<i32>,
+        #[serde(rename = "totalTokens")]
+        pub total_tokens: Option<i32>,
     }
 }
 
@@ -228,13 +215,18 @@ mod test {
     #[tokio::test]
     async fn chat() -> Result<()> {
         let glide = Client::default();
-        // TODO.
+
+        let router = "";
+        let request = todo!();
+        let response = glide.language.chat(router, request).await?;
+
         Ok(())
     }
 
     #[tokio::test]
     async fn stream() -> Result<()> {
         let glide = Client::default();
+        let _ = glide.language.stream("").await?;
         // TODO.
         Ok(())
     }

@@ -4,8 +4,8 @@ use std::sync::Arc;
 use reqwest::{Client as ReqwestClient, Method};
 
 use crate::config::Config;
+use crate::language::Language;
 use crate::Result;
-use crate::service::Language;
 
 /// A minimal [EinStack](https://einstack.ai/) client.
 ///
@@ -89,16 +89,19 @@ impl Client {
 
 impl Client {
     /// Returns `true` if the service is healthy.
+    ///
+    /// `GET /v1/health`
     pub async fn health(&self) -> Result<bool> {
+        #[derive(Debug, serde::Deserialize)]
+        pub struct Health {
+            pub healthy: bool,
+        }
+
         let request = self.config.build(Method::GET, "/v1/health/");
         let response = self.config.send(request).await?;
-        let content = response.json::<types::Health>().await?;
+        let content = response.json::<Health>().await?;
 
         Ok(content.healthy)
-    }
-
-    pub async fn chat(&self) -> Result<()> {
-        todo!()
     }
 }
 
@@ -123,14 +126,7 @@ impl fmt::Debug for Client {
     }
 }
 
-mod types {
-    use serde::Deserialize;
-
-    #[derive(Debug, Deserialize)]
-    pub struct Health {
-        pub healthy: bool,
-    }
-}
+mod types {}
 
 #[cfg(test)]
 mod test {

@@ -2,10 +2,12 @@
 #![doc = include_str!("../README.md")]
 
 pub use client::Client;
+pub use service::language;
 
 mod client;
 mod config;
-pub mod service;
+mod service;
+pub mod provider;
 
 pub mod types {
     //! Request and response types.
