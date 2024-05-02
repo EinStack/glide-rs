@@ -7,16 +7,16 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      
+
       - name: Set up Rust
-        uses: dtolnay/rust-toolchain@master
+        uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
 
       - name: Check out
         uses: actions/checkout@v4
 
-      - name: Use cached dependencies
+      - name: Set up Cache
         uses: Swatinem/rust-cache@v2
 
       - name: Semver

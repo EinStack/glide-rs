@@ -51,7 +51,8 @@ impl Config {
 
         match response.status() {
             x if x.is_client_error() || x.is_server_error() => {
-                let error = response.json::<SvcError>().await?;
+                let mut error = response.json::<SvcError>().await?;
+                error.status_code = x;
                 Err(Error::Glide(error))
             }
             _ => Ok(response),

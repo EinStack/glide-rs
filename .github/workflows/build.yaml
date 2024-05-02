@@ -2,14 +2,14 @@ on:
   push:
     branches:
       - main
-    pull_request:
+  pull_request:
+    branches:
       - main
 
 name: Build
 
 jobs:
-  ci:
-    name: CI
+  build:
     strategy:
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
@@ -18,12 +18,15 @@ jobs:
     steps:
 
       - name: Set up Rust
-        uses: dtolnay/rust-toolchain@master
+        uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: ${{ matrix.toolchain }}
 
       - name: Check out
         uses: actions/checkout@v4
+
+      - name: Set up Cache
+        uses: Swatinem/rust-cache@v2
 
       - name: Run Cargo:fmt
         run: cargo fmt --all -- --check

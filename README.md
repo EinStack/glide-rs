@@ -11,7 +11,7 @@
 
 > Glide is under active development right now 🛠️
 
-> Give us a star⭐ to support the project and watch👀 our repositories not to miss any update
+> Give us a star ⭐ to support the project and watch 👀 our repositories not to miss any update
 
 ## Features
 

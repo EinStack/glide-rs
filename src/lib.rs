@@ -7,6 +7,7 @@
 //!
 //! async fn main() -> Result<()> {
 //!     let glide = Client::default();
+//!     glide.health().await?;
 //!     let _ = glide.language.list().await?;
 //!     Ok(())
 //! }
@@ -17,13 +18,15 @@ pub use service::language;
 
 mod client;
 mod config;
-pub mod provider;
 mod service;
 
 /// Errors that may occur during the processing of API request.
 #[derive(Debug, thiserror::Error, serde::Deserialize)]
 #[error("{message}")]
 pub struct SvcError {
+    #[serde(skip)]
+    pub status_code: reqwest::StatusCode,
+    // TODO: Empty if Option<String> is None.
     pub message: String,
 }
 
@@ -33,6 +36,10 @@ pub enum Error {
     /// Errors that may occur during the processing an HTTP request.
     #[error("http error: {0}")]
     Http(#[from] reqwest::Error),
+
+    /// Errors that may occur during the processing an WS request.
+    #[error("websocket error: {0}")]
+    Ws(#[from] reqwest_websocket::Error),
 
     /// Errors that may occur during the processing of API request.
     #[error("glide error: {0}")]

@@ -27,9 +27,11 @@ rustls-tls = ["reqwest/rustls-tls"]
 
 [dependencies]
 reqwest = { version = "0.12.4", default-features = false, features = ["json"] }
-serde = { version = "1.0.199", features = ["derive"] }
+reqwest-websocket = { version = "0.3.0" }
+futures = { version = "0.3.30", default-features = false, features = [] }
 thiserror = { version = "1.0.59" }
-serde_json = "1.0.116"
+serde = { version = "1.0.200", features = ["derive"] }
+serde_json = { version = "1.0.116" }
 
 [dev-dependencies]
 tokio = { version = "1.37.0", features = ["macros", "test-util", "rt-multi-thread"] }

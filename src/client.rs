@@ -13,11 +13,11 @@ use crate::Result;
 ///
 /// ```rust,no_run
 /// use glide_rs::Client;
-/// use glide_rs::language::*;
 ///
 /// # let _ = async {
-/// let client = Client::default();
-/// let _ = client.language.list().await?;
+/// let glide = Client::default();
+/// glide.health().await?;
+/// let _ = glide.language.list().await?;
 /// # };
 /// ```
 #[must_use]
@@ -128,7 +128,6 @@ mod test {
     async fn health() -> Result<()> {
         let glide = Client::default();
         assert!(glide.health().await.is_ok());
-
         Ok(())
     }
 }
