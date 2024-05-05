@@ -8,8 +8,8 @@ use std::task::{Context, Poll};
 
 use futures::{Sink, SinkExt, Stream, StreamExt};
 use reqwest::Method;
-use reqwest_websocket::{Message, RequestBuilderExt, WebSocket};
 use reqwest_websocket::Error as WsError;
+use reqwest_websocket::{Message, RequestBuilderExt, WebSocket};
 
 use crate::config::Config;
 use crate::language::types::{ChatRequest, ChatResponse, RouterConfig};
@@ -29,7 +29,7 @@ impl LanguageSvc {
             pub routers: Vec<RouterConfig>,
         }
 
-        let request = self.0.build(Method::GET, "/v1/language/");
+        let request = self.0.create(Method::GET, "/v1/language/");
         let response = self.0.send(request).await?;
         let content = response.json::<RouterConfigs>().await?;
         Ok(content.routers)
@@ -41,7 +41,7 @@ impl LanguageSvc {
     pub async fn chat(&self, router: &str, data: ChatRequest) -> Result<ChatResponse> {
         let path = format!("/v1/language/{router}/chat");
 
-        let request = self.0.build(Method::POST, &path);
+        let request = self.0.create(Method::POST, &path);
         let response = self.0.send(request.json(&data)).await?;
         let content = response.json::<ChatResponse>().await?;
 
@@ -54,7 +54,7 @@ impl LanguageSvc {
     pub async fn stream(&self, router: &str) -> Result<Chat> {
         let path = format!("/v1/language/{router}/chatStream");
 
-        let request = self.0.build(Method::POST, &path).upgrade();
+        let request = self.0.create(Method::GET, &path).upgrade();
         let response = request.send().await?;
         let websocket = response.into_websocket().await?;
 
@@ -63,12 +63,15 @@ impl LanguageSvc {
 }
 
 impl fmt::Debug for LanguageSvc {
+    #[inline]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         fmt::Debug::fmt(&self.0, f)
     }
 }
 
-// TODO: Stream + Sink.
+/// WebSocket connection.
+///
+/// Implements `futures::`[`Stream`] and `futures::`[`Sink`].
 pub struct Chat {
     inner: WebSocket,
 }
@@ -107,7 +110,7 @@ impl Sink<Message> for Chat {
 }
 
 pub mod types {
-    /// Request and response types.
+    //! Request and response types.
 
     use std::collections::HashMap;
 
@@ -202,6 +205,7 @@ pub mod types {
     }
 
     /// TODO.
+    #[must_use]
     #[derive(Debug, Serialize)]
     pub struct ChatRequest {
         #[serde(rename = "message")]
@@ -233,6 +237,7 @@ pub mod types {
     }
 
     /// TODO.
+    #[must_use]
     #[derive(Debug, Deserialize)]
     pub struct ChatResponse {
         #[serde(skip_serializing_if = "Option::is_none")]
@@ -265,6 +270,7 @@ pub mod types {
     }
 
     /// TODO.
+    #[must_use]
     #[derive(Debug, Serialize, Deserialize)]
     pub struct ChatMessage {
         /// The content of the message.
@@ -289,6 +295,12 @@ pub mod types {
                 role: Role::User,
             }
         }
+
+        /// Overrides the default [`Role::User`] with [`Role::System`].
+        pub fn with_system(mut self) -> Self {
+            self.role = Role::System;
+            self
+        }
     }
 
     impl From<String> for ChatMessage {
@@ -306,12 +318,13 @@ pub mod types {
     /// The role of the author of this message.
     ///
     /// One of system, user, or assistant.
+    #[must_use]
     #[derive(Debug, Default, Serialize, Deserialize)]
     pub enum Role {
         #[serde(rename = "system")]
         System,
-        #[serde(rename = "user")]
         #[default]
+        #[serde(rename = "user")]
         User,
         #[serde(rename = "assistant")]
         Assistant,
@@ -333,14 +346,15 @@ pub mod types {
 mod test {
     use futures::StreamExt;
 
-    use crate::{Client, Result};
     use crate::language::types::ChatRequest;
+    use crate::{Client, Result};
 
     #[tokio::test]
     async fn list() -> Result<()> {
         let glide = Client::default();
         let response = glide.language.list().await?;
         assert_eq!(response.len(), 1);
+        dbg!(&response[0]);
 
         Ok(())
     }

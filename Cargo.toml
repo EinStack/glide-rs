@@ -17,9 +17,6 @@ categories = ["web-programming"]
 keywords = []
 description = "A minimal EinStack client."
 
-[lib]
-path = "src/lib.rs"
-
 [features]
 default = ["native-tsl"]
 native-tsl = ["reqwest/native-tls"]

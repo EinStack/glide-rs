@@ -13,37 +13,44 @@
 //! }
 //! ```
 
+pub use builder::Builder;
 pub use client::Client;
+pub(crate) use config::Config;
 pub use service::language;
 
+mod builder;
 mod client;
 mod config;
 mod service;
 
-/// Errors that may occur during the processing of API request.
-#[derive(Debug, thiserror::Error, serde::Deserialize)]
-#[error("{message}")]
-pub struct SvcError {
-    #[serde(skip)]
-    pub status_code: reqwest::StatusCode,
-    // TODO: Empty if Option<String> is None.
-    pub message: String,
+pub mod types {
+    //! Request and response types.
+
+    /// Errors that may occur during the processing of API request.
+    #[derive(Debug, thiserror::Error, serde::Deserialize)]
+    #[error("{message}")]
+    pub struct ErrorResponse {
+        #[serde(skip)]
+        pub status_code: reqwest::StatusCode,
+        // TODO: Empty if Option<String> is None.
+        pub message: String,
+    }
 }
 
-/// Error type for operations of a [`Client`].
+/// Error type for a [`Client`] client.
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
-    /// Errors that may occur during the processing an HTTP request.
+    /// Errors that may occur during the processing of an HTTP request.
     #[error("http error: {0}")]
     Http(#[from] reqwest::Error),
 
-    /// Errors that may occur during the processing an WS request.
+    /// Errors that may occur during the processing of a WS request.
     #[error("websocket error: {0}")]
     Ws(#[from] reqwest_websocket::Error),
 
-    /// Errors that may occur during the processing of API request.
-    #[error("glide error: {0}")]
-    Glide(#[from] SvcError),
+    /// Errors that may occur during the processing of an API request.
+    #[error("api error: {0}")]
+    Api(#[from] types::ErrorResponse),
 }
 
 /// Specialized [`Result`] type for an [`Error`].

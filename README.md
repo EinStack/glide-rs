@@ -23,10 +23,3 @@
 ```cmd
 cargo add glide-rs
 ```
-
-## Variables
-
-- `GLIDE_BASE_URL` to override the default base address:
-  `http://127.0.0.1:9099` (Optional).
-- `GLIDE_USER_AGENT` to override the default `User-Agent`: `glide-rs/0.1.0`
-  (Optional).
