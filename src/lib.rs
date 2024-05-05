@@ -1,17 +1,5 @@
 #![forbid(unsafe_code)]
 #![doc = include_str!("../README.md")]
-//! ## Usage
-//!
-//! ```rust,no_run
-//! use glide_rs::{Client, Result};
-//!
-//! async fn main() -> Result<()> {
-//!     let glide = Client::default();
-//!     glide.health().await?;
-//!     let _ = glide.language.list().await?;
-//!     Ok(())
-//! }
-//! ```
 
 pub use builder::Builder;
 pub use client::Client;
@@ -31,13 +19,13 @@ pub mod types {
     #[error("{message}")]
     pub struct ErrorResponse {
         #[serde(skip)]
-        pub status_code: reqwest::StatusCode,
+        pub status_code: u16,
         // TODO: Empty if Option<String> is None.
         pub message: String,
     }
 }
 
-/// Error type for a [`Client`] client.
+/// Error type for a [`Client`].
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
     /// Errors that may occur during the processing of an HTTP request.

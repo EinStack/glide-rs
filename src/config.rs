@@ -35,7 +35,8 @@ impl Config {
 
         match response.status() {
             x if x.is_client_error() || x.is_server_error() => {
-                let error = response.json::<ErrorResponse>().await?;
+                let mut error = response.json::<ErrorResponse>().await?;
+                error.status_code = x.as_u16();
                 Err(Error::Api(error))
             }
             _ => Ok(response),

@@ -10,7 +10,7 @@ pub struct Builder {
     api_key: String,
     base_url: Option<Url>,
     user_agent: Option<String>,
-    client: Option<RwClient>,
+    http_client: Option<RwClient>,
 }
 
 impl Builder {
@@ -20,7 +20,7 @@ impl Builder {
             api_key: api_key.to_owned(),
             base_url: None,
             user_agent: None,
-            client: None,
+            http_client: None,
         }
     }
 
@@ -43,8 +43,8 @@ impl Builder {
     /// Overrides the `HTTP` client.
     ///
     /// Default value: `reqwest::Client::default()`
-    pub fn with_client(mut self, client: RwClient) -> Self {
-        self.client = Some(client);
+    pub fn with_http_client(mut self, client: RwClient) -> Self {
+        self.http_client = Some(client);
         self
     }
 
@@ -54,7 +54,7 @@ impl Builder {
             api_key: self.api_key,
             user_agent: self.user_agent.unwrap_or_else(default_user_agent),
             base_url: self.base_url.unwrap_or_else(default_base_url),
-            client: self.client.unwrap_or_default(),
+            client: self.http_client.unwrap_or_default(),
         };
 
         config.into_client()
@@ -63,14 +63,18 @@ impl Builder {
 
 impl fmt::Debug for Builder {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("Builder").finish_non_exhaustive()
+        f.debug_struct("Builder")
+            .field("user_agent", &self.user_agent.is_some())
+            .field("base_url", &self.base_url.is_some())
+            .field("http_client", &self.http_client.is_some())
+            .finish_non_exhaustive()
     }
 }
 
-pub fn default_base_url() -> Url {
+fn default_base_url() -> Url {
     Url::parse("https://api.einstack.com").unwrap()
 }
 
-pub fn default_user_agent() -> String {
+fn default_user_agent() -> String {
     format!("{}/{}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"))
 }

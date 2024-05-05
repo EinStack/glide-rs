@@ -23,3 +23,17 @@
 ```cmd
 cargo add glide-rs
 ```
+
+## Usage
+
+```rust
+use glide_rs::{Client, Result};
+
+#[tokio::main]
+async fn main() -> Result<()> {
+    let glide = Client::default();
+    glide.health().await?;
+    let _ = glide.language.list().await?;
+    Ok(())
+}
+```
