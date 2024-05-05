@@ -8,12 +8,11 @@ use std::task::{Context, Poll};
 
 use futures::{Sink, SinkExt, Stream, StreamExt};
 use reqwest::Method;
-use reqwest_websocket::Error as WsError;
 use reqwest_websocket::{Message, RequestBuilderExt, WebSocket};
 
 use crate::config::Config;
 use crate::language::types::{ChatRequest, ChatResponse, RouterConfig};
-use crate::Result;
+use crate::{Error, Result};
 
 /// `Glide` APIs for `/v1/language` endpoints.
 #[derive(Clone)]
@@ -77,35 +76,35 @@ pub struct Chat {
 }
 
 impl Stream for Chat {
-    type Item = Result<Message, WsError>;
+    type Item = Result<Message>;
 
     #[inline]
     fn poll_next(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {
-        self.inner.poll_next_unpin(cx)
+        self.inner.poll_next_unpin(cx).map_err(Into::into)
     }
 }
 
 impl Sink<Message> for Chat {
-    type Error = WsError;
+    type Error = Error;
 
     #[inline]
     fn poll_ready(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Result<(), Self::Error>> {
-        self.inner.poll_ready_unpin(cx)
+        self.inner.poll_ready_unpin(cx).map_err(Into::into)
     }
 
     #[inline]
     fn start_send(mut self: Pin<&mut Self>, item: Message) -> Result<(), Self::Error> {
-        self.inner.start_send_unpin(item)
+        self.inner.start_send_unpin(item).map_err(Into::into)
     }
 
     #[inline]
     fn poll_flush(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Result<(), Self::Error>> {
-        self.inner.poll_flush_unpin(cx)
+        self.inner.poll_flush_unpin(cx).map_err(Into::into)
     }
 
     #[inline]
     fn poll_close(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Result<(), Self::Error>> {
-        self.inner.poll_close_unpin(cx)
+        self.inner.poll_close_unpin(cx).map_err(Into::into)
     }
 }
 

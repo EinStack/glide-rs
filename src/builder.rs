@@ -26,7 +26,7 @@ impl Builder {
 
     /// Overrides the `base URL`.
     ///
-    /// Default value: <api.einstack.com>
+    /// Default value: <http://127.0.0.1:9099/>
     pub fn with_base_url(mut self, base_url: Url) -> Self {
         self.base_url = Some(base_url);
         self
@@ -34,7 +34,7 @@ impl Builder {
 
     /// Overrides the `User-Agent` header.
     ///
-    /// Default value: `glide-rs/0.1.0`
+    /// Default value: `Glide/0.1.0 (Rust; Ver 1.70.0)`
     pub fn with_user_agent(mut self, user_agent: &str) -> Self {
         self.user_agent = Some(user_agent.to_owned());
         self
@@ -72,9 +72,13 @@ impl fmt::Debug for Builder {
 }
 
 fn default_base_url() -> Url {
-    Url::parse("https://api.einstack.com").unwrap()
+    Url::parse("http://127.0.0.1:9099/").unwrap()
 }
 
 fn default_user_agent() -> String {
-    format!("{}/{}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"))
+    format!(
+        "Glide/{} (Rust; Ver {})",
+        env!("CARGO_PKG_VERSION"),
+        env!("CARGO_PKG_RUST_VERSION")
+    )
 }
