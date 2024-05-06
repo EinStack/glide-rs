@@ -1,7 +1,7 @@
+use std::fmt;
 use std::sync::Arc;
-use std::{env, fmt};
 
-use reqwest::{Client as RwClient, Method, Url};
+use reqwest::{Client as RwClient, Method};
 
 use crate::language::LanguageSvc;
 use crate::{Builder, Config, Result};
@@ -29,6 +29,11 @@ pub struct Client {
 
 impl Client {
     /// Creates a new [`EinStack`] `Glide` client.
+    ///
+    /// ### Panics
+    ///
+    /// - Panics if the environment variable `GLIDE_BASE_URL` is set but is not a valid `URL`.
+    /// - Panics if the environment variable `GLIDE_USER_AGENT` is set but is not a valid `String`.
     ///
     /// [`EinStack`]: https://www.einstack.ai/
     pub fn new(api_key: &str) -> Self {
@@ -98,21 +103,7 @@ impl Default for Client {
     /// - Panics if the environment variable `GLIDE_BASE_URL` is set but is not a valid `URL`.
     /// - Panics if the environment variable `GLIDE_USER_AGENT` is set but is not a valid `String`.
     fn default() -> Self {
-        let api_key = env::var("GLIDE_API_KEY")
-            .expect("env variable `GLIDE_API_KEY` should be a valid API key");
-        let mut builder = Self::builder(&api_key);
-
-        if let Ok(x) = env::var("GLIDE_BASE_URL") {
-            builder = builder.with_base_url(
-                Url::parse(&x).expect("env variable `GLIDE_BASE_URL` should be a valid URL"),
-            );
-        }
-
-        if let Ok(x) = env::var("GLIDE_USER_AGENT") {
-            builder = builder.with_user_agent(&x);
-        }
-
-        builder.build()
+        Builder::default().build()
     }
 }
 

@@ -1,4 +1,4 @@
-use std::fmt;
+use std::{env, fmt};
 
 use reqwest::{Client as RwClient, Url};
 
@@ -15,13 +15,32 @@ pub struct Builder {
 
 impl Builder {
     /// Creates a new [`Builder`].
+    ///
+    /// Same as [`Client::builder`].
+    ///
+    /// ### Panics
+    ///
+    /// - Panics if the environment variable `GLIDE_BASE_URL` is set but is not a valid `URL`.
+    /// - Panics if the environment variable `GLIDE_USER_AGENT` is set but is not a valid `String`.
     pub fn new(api_key: &str) -> Self {
-        Self {
+        let mut builder = Self {
             api_key: api_key.to_owned(),
             base_url: None,
             user_agent: None,
             http_client: None,
+        };
+
+        if let Ok(x) = env::var("GLIDE_BASE_URL") {
+            builder = builder.with_base_url(
+                Url::parse(&x).expect("env variable `GLIDE_BASE_URL` should be a valid URL"),
+            );
         }
+
+        if let Ok(x) = env::var("GLIDE_USER_AGENT") {
+            builder = builder.with_user_agent(&x);
+        }
+
+        builder
     }
 
     /// Overrides the `base URL`.
@@ -58,6 +77,22 @@ impl Builder {
         };
 
         config.into_client()
+    }
+}
+
+impl Default for Builder {
+    /// Creates a new [`Builder`] from environment variables.
+    ///
+    /// ### Panics
+    ///
+    /// - Panics if the environment variable `GLIDE_API_KEY` is not set.
+    /// - Panics if the environment variable `GLIDE_BASE_URL` is set but is not a valid `URL`.
+    /// - Panics if the environment variable `GLIDE_USER_AGENT` is set but is not a valid `String`.
+    fn default() -> Self {
+        let api_key = env::var("GLIDE_API_KEY")
+            .expect("env variable `GLIDE_API_KEY` should be a valid API key");
+
+        Builder::new(&api_key)
     }
 }
 
