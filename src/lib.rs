@@ -20,7 +20,6 @@ pub mod types {
     pub struct ErrorResponse {
         #[serde(skip)]
         pub status_code: u16,
-        // TODO: Empty if Option<String> is None.
         pub message: String,
     }
 }

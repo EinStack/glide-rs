@@ -30,26 +30,21 @@ pub struct Client {
 impl Client {
     /// Creates a new [`EinStack`] `Glide` client.
     ///
-    /// ### Panics
-    ///
-    /// - Panics if the environment variable `GLIDE_BASE_URL` is set but is not a valid `URL`.
-    /// - Panics if the environment variable `GLIDE_USER_AGENT` is set but is not a valid `String`.
-    ///
     /// [`EinStack`]: https://www.einstack.ai/
-    pub fn new(api_key: &str) -> Self {
-        Builder::new(api_key).build()
+    pub fn new() -> Self {
+        Builder::new().build()
     }
 
     /// Creates a new [`Client`] builder.
-    pub fn builder(api_key: &str) -> Builder {
-        Builder::new(api_key)
+    pub fn builder() -> Builder {
+        Builder::new()
     }
 
     /// Returns the reference to the provided `API key`.
     #[inline]
     #[must_use]
-    pub fn api_key(&self) -> &str {
-        self.config.api_key.as_ref()
+    pub fn api_key(&self) -> Option<&str> {
+        self.config.api_key.as_deref()
     }
 
     /// Returns the reference to the used `User-Agent` header value.
@@ -99,7 +94,7 @@ impl Default for Client {
     ///
     /// ### Panics
     ///
-    /// - Panics if the environment variable `GLIDE_API_KEY` is not set.
+    /// - Panics if the environment variable `GLIDE_API_KEY` is set but is not a valid `String`.
     /// - Panics if the environment variable `GLIDE_BASE_URL` is set but is not a valid `URL`.
     /// - Panics if the environment variable `GLIDE_USER_AGENT` is set but is not a valid `String`.
     fn default() -> Self {
@@ -119,8 +114,8 @@ mod test {
 
     #[test]
     fn create() -> Result<()> {
-        let _ = Client::new("");
-        let _ = Client::builder("").build();
+        let _ = Client::new();
+        let _ = Client::builder().build();
         let _ = Client::default();
         Ok(())
     }

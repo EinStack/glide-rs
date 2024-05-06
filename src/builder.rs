@@ -7,7 +7,7 @@ use crate::{Client, Config};
 /// [`Client`] builder.
 #[must_use]
 pub struct Builder {
-    api_key: String,
+    api_key: Option<String>,
     base_url: Option<Url>,
     user_agent: Option<String>,
     http_client: Option<RwClient>,
@@ -17,30 +17,19 @@ impl Builder {
     /// Creates a new [`Builder`].
     ///
     /// Same as [`Client::builder`].
-    ///
-    /// ### Panics
-    ///
-    /// - Panics if the environment variable `GLIDE_BASE_URL` is set but is not a valid `URL`.
-    /// - Panics if the environment variable `GLIDE_USER_AGENT` is set but is not a valid `String`.
-    pub fn new(api_key: &str) -> Self {
-        let mut builder = Self {
-            api_key: api_key.to_owned(),
+    pub fn new() -> Self {
+        Self {
+            api_key: None,
             base_url: None,
             user_agent: None,
             http_client: None,
-        };
-
-        if let Ok(x) = env::var("GLIDE_BASE_URL") {
-            builder = builder.with_base_url(
-                Url::parse(&x).expect("env variable `GLIDE_BASE_URL` should be a valid URL"),
-            );
         }
+    }
 
-        if let Ok(x) = env::var("GLIDE_USER_AGENT") {
-            builder = builder.with_user_agent(&x);
-        }
-
-        builder
+    /// Attaches the `API key`.
+    pub fn with_api_key(mut self, api_key: &str) -> Self {
+        self.api_key = Some(api_key.to_owned());
+        self
     }
 
     /// Overrides the `base URL`.
@@ -68,9 +57,15 @@ impl Builder {
     }
 
     /// Creates a new [`Client`].
+    ///
+    /// ### Panics
+    ///
+    /// - Panics if the environment variable `GLIDE_API_KEY` is set but is not a valid `String`.
+    /// - Panics if the environment variable `GLIDE_BASE_URL` is set but is not a valid `URL`.
+    /// - Panics if the environment variable `GLIDE_USER_AGENT` is set but is not a valid `String`.
     pub fn build(self) -> Client {
         let config = Config {
-            api_key: self.api_key,
+            api_key: self.api_key.or_else(default_api_key),
             user_agent: self.user_agent.unwrap_or_else(default_user_agent),
             base_url: self.base_url.unwrap_or_else(default_base_url),
             client: self.http_client.unwrap_or_default(),
@@ -81,18 +76,8 @@ impl Builder {
 }
 
 impl Default for Builder {
-    /// Creates a new [`Builder`] from environment variables.
-    ///
-    /// ### Panics
-    ///
-    /// - Panics if the environment variable `GLIDE_API_KEY` is not set.
-    /// - Panics if the environment variable `GLIDE_BASE_URL` is set but is not a valid `URL`.
-    /// - Panics if the environment variable `GLIDE_USER_AGENT` is set but is not a valid `String`.
     fn default() -> Self {
-        let api_key = env::var("GLIDE_API_KEY")
-            .expect("env variable `GLIDE_API_KEY` should be a valid API key");
-
-        Builder::new(&api_key)
+        Builder::new()
     }
 }
 
@@ -106,11 +91,25 @@ impl fmt::Debug for Builder {
     }
 }
 
+// TODO: Panic if not a valid utf-8 string.
+
+fn default_api_key() -> Option<String> {
+    env::var("GLIDE_API_KEY").ok()
+}
+
 fn default_base_url() -> Url {
+    if let Ok(x) = env::var("GLIDE_BASE_URL") {
+        return Url::parse(&x).expect("env variable `GLIDE_BASE_URL` should be a valid URL");
+    }
+
     Url::parse("http://127.0.0.1:9099/").unwrap()
 }
 
 fn default_user_agent() -> String {
+    if let Ok(x) = env::var("GLIDE_USER_AGENT") {
+        return x;
+    };
+
     format!(
         "Glide/{} (Rust; Ver {})",
         env!("CARGO_PKG_VERSION"),

@@ -8,8 +8,8 @@ use crate::language::LanguageSvc;
 use crate::{types::ErrorResponse, Client, Error, Result};
 
 pub struct Config {
+    pub api_key: Option<String>,
     pub user_agent: String,
-    pub api_key: String,
     pub base_url: Url,
     pub client: RwClient,
 }
@@ -22,10 +22,16 @@ impl Config {
             .join(path)
             .expect("should be a valid `API` endpoint");
 
-        self.client
+        let builder = self
+            .client
             .request(method, path)
-            .bearer_auth(&self.api_key)
-            .header(USER_AGENT, &self.user_agent)
+            .header(USER_AGENT, &self.user_agent);
+
+        if let Some(key) = &self.api_key {
+            builder.bearer_auth(key)
+        } else {
+            builder
+        }
     }
 
     /// Builds and executes the [`RequestBuilder`].

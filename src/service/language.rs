@@ -34,7 +34,7 @@ impl LanguageSvc {
         Ok(content.routers)
     }
 
-    /// TODO.
+    /// Sends a single chat request to a specified router and retrieves the response.
     ///
     /// `POST /v1/language/{router}/chat`
     pub async fn chat(&self, router: &str, data: ChatRequest) -> Result<ChatResponse> {
@@ -47,7 +47,7 @@ impl LanguageSvc {
         Ok(content)
     }
 
-    /// TODO: <https://crates.io/crates/reqwest-websocket>
+    /// Establishes a WebSocket connection for streaming chat messages from a specified router.
     ///
     /// `GET /v1/language/{router}/chatStream`
     pub async fn stream(&self, router: &str) -> Result<Chat> {
@@ -68,7 +68,7 @@ impl fmt::Debug for LanguageSvc {
     }
 }
 
-/// WebSocket connection.
+/// Chat WebSocket connection.
 ///
 /// Implements `futures::`[`Stream`] and `futures::`[`Sink`].
 pub struct Chat {
