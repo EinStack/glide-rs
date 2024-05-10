@@ -69,9 +69,7 @@ impl Client {
     pub fn client(&self) -> &RwClient {
         &self.config.client
     }
-}
 
-impl Client {
     /// Returns `true` if the service is healthy.
     ///
     /// `GET /v1/health`

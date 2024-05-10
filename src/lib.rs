@@ -4,12 +4,11 @@
 pub use builder::Builder;
 pub use client::Client;
 pub(crate) use config::Config;
-pub use service::language;
 
 mod builder;
 mod client;
 mod config;
-mod service;
+pub mod language;
 
 pub mod types {
     //! Request and response types.
