@@ -17,9 +17,11 @@ pub mod types {
     #[derive(Debug, thiserror::Error, serde::Deserialize)]
     #[error("{message}")]
     pub struct ErrorResponse {
+        pub name: String,
+        pub message: String,
+
         #[serde(skip)]
         pub status_code: u16,
-        pub message: String,
     }
 }
 
