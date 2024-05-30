@@ -10,9 +10,9 @@ use futures::{Sink, SinkExt, Stream, StreamExt};
 use reqwest::Method;
 use reqwest_websocket::{Message, RequestBuilderExt, WebSocket};
 
-use crate::{Error, Result};
 use crate::config::Config;
 use crate::language::types::{ChatRequest, ChatResponse, RouterConfig};
+use crate::{Error, Result};
 
 mod types;
 
@@ -116,8 +116,8 @@ impl Sink<Message> for Chat {
 mod test {
     use futures::StreamExt;
 
-    use crate::{Client, Result};
     use crate::language::types::ChatRequest;
+    use crate::{Client, Result};
 
     #[tokio::test]
     async fn list() -> Result<()> {
@@ -147,7 +147,7 @@ mod test {
         let router = "myrouter";
         let ws = glide.language.stream(router).await?;
         let (tx, rx) = ws.split();
-        // TODO.
+        // TODO: test streaming chat.
 
         Ok(())
     }
