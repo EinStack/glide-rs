@@ -1,10 +1,11 @@
-//! Request and response types.
+//! Request and response types for `/v1/language` endpoints.
+//!
 
 use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
-/// TODO.
+/// Unified chat request across all language models.
 #[must_use]
 #[derive(Debug, Serialize)]
 pub struct ChatRequest {
@@ -13,7 +14,7 @@ pub struct ChatRequest {
     #[serde(rename = "message_history", skip_serializing_if = "Option::is_none")]
     pub message_history: Option<Vec<ChatMessage>>,
     #[serde(rename = "override_params", skip_serializing_if = "Option::is_none")]
-    pub override_params: Option<ChatMessageOverride>,
+    pub override_params: Option<ChatRequestOverride>,
 }
 
 impl ChatRequest {
@@ -23,8 +24,11 @@ impl ChatRequest {
     }
 }
 
-impl From<ChatMessage> for ChatRequest {
-    fn from(message: ChatMessage) -> Self {
+impl<T> From<T> for ChatRequest
+where
+    T: Into<ChatMessage>,
+{
+    fn from(message: T) -> Self {
         Self {
             message: message.into(),
             message_history: None,
@@ -33,7 +37,7 @@ impl From<ChatMessage> for ChatRequest {
     }
 }
 
-/// TODO.
+/// Content and role of the message.
 #[must_use]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ChatMessage {
@@ -95,7 +99,7 @@ pub enum Role {
     Assistant,
 }
 
-/// TODO.
+/// Router configuration.
 #[derive(Debug, Deserialize)]
 pub struct RouterConfig {
     /// Is router enabled.
@@ -110,7 +114,7 @@ pub struct RouterConfig {
     pub strategy: String,
 }
 
-/// TODO.
+/// Retry configuration.
 #[derive(Debug, Deserialize)]
 pub struct RetryConfig {
     pub base_multiplier: i32,
@@ -119,7 +123,7 @@ pub struct RetryConfig {
     pub max_retries: i32,
 }
 
-/// TODO.
+/// Provider model configuration.
 #[derive(Debug, Deserialize)]
 pub struct LangModelConfig {
     /// Model instance ID (unique in scope of the router).
@@ -136,14 +140,14 @@ pub struct LangModelConfig {
     pub latency_config: Option<LatencyConfig>,
 }
 
-/// TODO.
+/// Timeout configuration.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ClientsConfig {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub timeout: Option<i64>,
 }
 
-/// TODO.
+/// Latency configuration.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct LatencyConfig {
     /// Weight of new latency measurements
@@ -183,16 +187,16 @@ pub enum ProviderConfig {
     OpenAi(serde_json::Value),
 }
 
-/// TODO.
+/// Override of a single chat request.
 #[derive(Debug, Serialize)]
-pub struct ChatMessageOverride {
+pub struct ChatRequestOverride {
     #[serde(rename = "message")]
     pub message: ChatMessage,
     #[serde(rename = "model_id")]
     pub model_id: String,
 }
 
-/// TODO.
+/// Unified chat response across all language models.
 #[must_use]
 #[derive(Debug, Deserialize)]
 pub struct ChatResponse {
@@ -206,18 +210,18 @@ pub struct ChatResponse {
     pub router_id: Option<String>,
 }
 
-/// TODO.
+/// Unified response from the provider.
 #[derive(Debug, Deserialize)]
 pub struct ModelResponse {
-    pub message: Option<ChatMessage>,
+    pub message: ChatMessage,
     pub metadata: Option<HashMap<String, String>>,
-    pub token_count: Option<TokenUsage>,
+    pub token_count: TokenUsage,
 }
 
-/// TODO.
+/// Prompt, response and total token usage.
 #[derive(Debug, Deserialize)]
 pub struct TokenUsage {
-    pub prompt_tokens: Option<i32>,
-    pub response_tokens: Option<i32>,
-    pub total_tokens: Option<i32>,
+    pub prompt_tokens: i32,
+    pub response_tokens: i32,
+    pub total_tokens: i32,
 }

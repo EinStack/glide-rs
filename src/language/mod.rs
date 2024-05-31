@@ -14,9 +14,9 @@ use crate::config::Config;
 use crate::language::types::{ChatRequest, ChatResponse, RouterConfig};
 use crate::{Error, Result};
 
-mod types;
+pub mod types;
 
-/// `Glide` APIs for `/v1/language` endpoints.
+/// APIs for `/v1/language` endpoints.
 #[derive(Clone)]
 pub struct LanguageSvc(pub(crate) Arc<Config>);
 
@@ -70,7 +70,7 @@ impl fmt::Debug for LanguageSvc {
     }
 }
 
-/// Chat WebSocket connection.
+/// Streaming chat WebSocket connection.
 ///
 /// Implements `futures::`[`Stream`] and `futures::`[`Sink`].
 pub struct Chat {
