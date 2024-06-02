@@ -6,6 +6,7 @@ use crate::{Client, Config};
 
 /// [`Client`] builder.
 #[must_use]
+#[derive(Clone)]
 pub struct Builder {
     api_key: Option<String>,
     base_url: Option<Url>,
@@ -91,18 +92,22 @@ impl fmt::Debug for Builder {
     }
 }
 
-// TODO: Panic if not a valid utf-8 string.
-
 fn default_api_key() -> Option<String> {
-    env::var("GLIDE_API_KEY").ok()
+    match env::var("GLIDE_API_KEY") {
+        Ok(var) => Some(var),
+        Err(env::VarError::NotPresent) => None,
+        Err(_) => panic!("env variable `GLIDE_BASE_URL` should be a valid URL"),
+    }
 }
 
 fn default_base_url() -> Url {
-    if let Ok(x) = env::var("GLIDE_BASE_URL") {
-        return Url::parse(&x).expect("env variable `GLIDE_BASE_URL` should be a valid URL");
-    }
+    let url = if let Ok(x) = env::var("GLIDE_BASE_URL") {
+        Url::parse(&x)
+    } else {
+        Url::parse("http://127.0.0.1:9099/")
+    };
 
-    Url::parse("http://127.0.0.1:9099/").unwrap()
+    url.expect("env variable `GLIDE_BASE_URL` should be a valid URL")
 }
 
 fn default_user_agent() -> String {

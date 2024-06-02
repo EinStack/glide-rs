@@ -1,11 +1,11 @@
 use std::fmt;
 use std::sync::Arc;
 
-use reqwest::header::USER_AGENT;
 use reqwest::{Client as RwClient, Method, RequestBuilder, Response, Url};
+use reqwest::header::USER_AGENT;
 
-use crate::language::LanguageSvc;
-use crate::{types::ErrorResponse, Client, Error, Result};
+use crate::{Client, Error, Result, types::ErrorResponse};
+use crate::language::Language;
 
 pub struct Config {
     pub api_key: Option<String>,
@@ -55,7 +55,7 @@ impl Config {
 
         Client {
             config: config.clone(),
-            language: LanguageSvc(config),
+            language: Language(config),
         }
     }
 }

@@ -25,8 +25,8 @@ impl ChatRequest {
 }
 
 impl<T> From<T> for ChatRequest
-where
-    T: Into<ChatMessage>,
+    where
+        T: Into<ChatMessage>,
 {
     fn from(message: T) -> Self {
         Self {
@@ -170,7 +170,7 @@ pub enum ProviderConfig {
     /// <https://azure.microsoft.com/en-us/products/ai-services/openai-service>
     #[serde(rename = "azureopenai")]
     AzureOpenAi(serde_json::Value),
-    /// TODO.
+    /// https://aws.amazon.com/bedrock/
     #[serde(rename = "bedrock")]
     Bedrock(serde_json::Value),
     /// <https://cohere.com/>

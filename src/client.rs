@@ -3,8 +3,8 @@ use std::sync::Arc;
 
 use reqwest::{Client as RwClient, Method};
 
-use crate::language::LanguageSvc;
 use crate::{Builder, Config, Result};
+use crate::language::Language;
 
 /// A minimal [EinStack](https://einstack.ai/) client.
 ///
@@ -24,7 +24,7 @@ use crate::{Builder, Config, Result};
 pub struct Client {
     pub(crate) config: Arc<Config>,
     /// `Glide` APIs for `/v1/language` endpoints.
-    pub language: LanguageSvc,
+    pub language: Language,
 }
 
 impl Client {

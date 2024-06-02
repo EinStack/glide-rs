@@ -10,17 +10,17 @@ use futures::{Sink, SinkExt, Stream, StreamExt};
 use reqwest::Method;
 use reqwest_websocket::{Message, RequestBuilderExt, WebSocket};
 
+use crate::{Error, Result};
 use crate::config::Config;
 use crate::language::types::{ChatRequest, ChatResponse, RouterConfig};
-use crate::{Error, Result};
 
 pub mod types;
 
 /// APIs for `/v1/language` endpoints.
 #[derive(Clone)]
-pub struct LanguageSvc(pub(crate) Arc<Config>);
+pub struct Language(pub(crate) Arc<Config>);
 
-impl LanguageSvc {
+impl Language {
     /// Retrieves a list of all router configs.
     ///
     /// `GET /v1/language`
@@ -63,7 +63,7 @@ impl LanguageSvc {
     }
 }
 
-impl fmt::Debug for LanguageSvc {
+impl fmt::Debug for Language {
     #[inline]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         fmt::Debug::fmt(&self.0, f)
@@ -116,8 +116,8 @@ impl Sink<Message> for Chat {
 mod test {
     use futures::StreamExt;
 
-    use crate::language::types::ChatRequest;
     use crate::{Client, Result};
+    use crate::language::types::ChatRequest;
 
     #[tokio::test]
     async fn list() -> Result<()> {
