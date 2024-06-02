@@ -10,9 +10,9 @@ use futures::{Sink, SinkExt, Stream, StreamExt};
 use reqwest::Method;
 use reqwest_websocket::{Message, RequestBuilderExt, WebSocket};
 
-use crate::{Error, Result};
 use crate::config::Config;
-use crate::language::types::{ChatRequest, ChatResponse, RouterConfig};
+use crate::language::types::{ChatRequest, ChatResponse, RouterConfigs};
+use crate::{Error, Result};
 
 pub mod types;
 
@@ -24,16 +24,11 @@ impl Language {
     /// Retrieves a list of all router configs.
     ///
     /// `GET /v1/language`
-    pub async fn list(&self) -> Result<Vec<RouterConfig>> {
-        #[derive(Debug, serde::Deserialize)]
-        struct RouterConfigs {
-            pub routers: Vec<RouterConfig>,
-        }
-
+    pub async fn list(&self) -> Result<RouterConfigs> {
         let request = self.0.create(Method::GET, "/v1/language/");
         let response = self.0.send(request).await?;
         let content = response.json::<RouterConfigs>().await?;
-        Ok(content.routers)
+        Ok(content)
     }
 
     /// Sends a single chat request to a specified router and retrieves the response.
@@ -116,8 +111,8 @@ impl Sink<Message> for Chat {
 mod test {
     use futures::StreamExt;
 
-    use crate::{Client, Result};
     use crate::language::types::ChatRequest;
+    use crate::{Client, Result};
 
     #[tokio::test]
     async fn list() -> Result<()> {

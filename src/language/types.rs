@@ -25,8 +25,8 @@ impl ChatRequest {
 }
 
 impl<T> From<T> for ChatRequest
-    where
-        T: Into<ChatMessage>,
+where
+    T: Into<ChatMessage>,
 {
     fn from(message: T) -> Self {
         Self {
@@ -99,7 +99,13 @@ pub enum Role {
     Assistant,
 }
 
-/// Router configuration.
+/// All router configurations.
+#[derive(Debug, Deserialize)]
+pub struct RouterConfigs {
+    pub routers: Vec<RouterConfig>,
+}
+
+/// Single router configuration.
 #[derive(Debug, Deserialize)]
 pub struct RouterConfig {
     /// Is router enabled.
@@ -170,7 +176,7 @@ pub enum ProviderConfig {
     /// <https://azure.microsoft.com/en-us/products/ai-services/openai-service>
     #[serde(rename = "azureopenai")]
     AzureOpenAi(serde_json::Value),
-    /// https://aws.amazon.com/bedrock/
+    /// <https://aws.amazon.com/bedrock/>
     #[serde(rename = "bedrock")]
     Bedrock(serde_json::Value),
     /// <https://cohere.com/>

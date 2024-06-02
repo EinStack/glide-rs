@@ -3,8 +3,8 @@ use std::sync::Arc;
 
 use reqwest::{Client as RwClient, Method};
 
-use crate::{Builder, Config, Result};
 use crate::language::Language;
+use crate::{Builder, Config, Result};
 
 /// A minimal [EinStack](https://einstack.ai/) client.
 ///
