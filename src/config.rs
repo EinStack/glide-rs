@@ -42,7 +42,7 @@ impl Config {
         match response.status() {
             x if x.is_client_error() || x.is_server_error() => {
                 let mut error = response.json::<ErrorResponse>().await?;
-                error.status_code = x.as_u16();
+                error.status = x;
                 Err(Error::Api(error))
             }
             _ => Ok(response),
@@ -55,7 +55,7 @@ impl Config {
 
         Client {
             config: config.clone(),
-            language: Language(config),
+            lang: Language(config),
         }
     }
 }

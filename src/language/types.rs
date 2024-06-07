@@ -207,14 +207,14 @@ pub struct ChatRequestOverride {
 #[must_use]
 #[derive(Debug, Deserialize)]
 pub struct ChatResponse {
-    pub cached: Option<bool>,
-    pub created_at: Option<i32>,
-    pub id: Option<String>,
-    pub model_id: Option<String>,
-    pub model_name: Option<String>,
-    pub model_response: Option<ModelResponse>,
-    pub provider_id: Option<String>,
-    pub router_id: Option<String>,
+    pub cached: bool,
+    pub created_at: i32,
+    pub id: String,
+    pub model_id: String,
+    pub model_name: String,
+    pub model_response: ModelResponse,
+    pub provider_id: String,
+    pub router_id: String,
 }
 
 /// Unified response from the provider.

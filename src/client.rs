@@ -16,7 +16,7 @@ use crate::{Builder, Config, Result};
 /// # let _ = async {
 /// let glide = Client::default();
 /// glide.health().await?;
-/// let _ = glide.language.list().await?;
+/// let _ = glide.lang.list().await?;
 /// # };
 /// ```
 #[must_use]
@@ -24,7 +24,7 @@ use crate::{Builder, Config, Result};
 pub struct Client {
     pub(crate) config: Arc<Config>,
     /// `Glide` APIs for `/v1/language` endpoints.
-    pub language: Language,
+    pub lang: Language,
 }
 
 impl Client {
@@ -96,7 +96,7 @@ impl Default for Client {
     /// - Panics if the environment variable `GLIDE_BASE_URL` is set but is not a valid `URL`.
     /// - Panics if the environment variable `GLIDE_USER_AGENT` is set but is not a valid `String`.
     fn default() -> Self {
-        Builder::default().build()
+        Self::builder().build()
     }
 }
 

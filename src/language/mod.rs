@@ -44,7 +44,7 @@ impl Language {
         Ok(content)
     }
 
-    /// Establishes a WebSocket connection for streaming chat messages from a specified router.
+    /// Establishes a `WebSocket` connection for streaming chat messages from a specified router.
     ///
     /// `GET /v1/language/{router}/chatStream`
     pub async fn stream(&self, router: &str) -> Result<Chat> {
@@ -65,7 +65,7 @@ impl fmt::Debug for Language {
     }
 }
 
-/// Streaming chat WebSocket connection.
+/// Streaming chat `WebSocket` connection.
 ///
 /// Implements `futures::`[`Stream`] and `futures::`[`Sink`].
 pub struct Chat {
@@ -117,7 +117,7 @@ mod test {
     #[tokio::test]
     async fn list() -> Result<()> {
         let glide = Client::default();
-        let response = glide.language.list().await?;
+        let response = glide.lang.list().await?;
         assert_eq!(response.len(), 1);
         dbg!(&response[0]);
 
@@ -130,7 +130,7 @@ mod test {
 
         let router = "myrouter";
         let request = ChatRequest::new("Hello!");
-        let _ = glide.language.chat(router, request).await?;
+        let _ = glide.lang.chat(router, request).await?;
 
         Ok(())
     }
@@ -140,7 +140,7 @@ mod test {
         let glide = Client::default();
 
         let router = "myrouter";
-        let ws = glide.language.stream(router).await?;
+        let ws = glide.lang.stream(router).await?;
         let (tx, rx) = ws.split();
         // TODO: test streaming chat.
 

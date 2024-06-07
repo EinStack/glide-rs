@@ -1,3 +1,4 @@
+use reqwest::StatusCode;
 use serde::Deserialize;
 use thiserror::Error;
 
@@ -25,11 +26,12 @@ pub struct ErrorResponse {
     pub message: String,
 
     #[serde(skip)]
-    pub status_code: u16,
+    pub status: StatusCode,
 }
 
 impl ErrorResponse {
     /// Returns the [`ErrorKind`].
+    #[must_use]
     pub fn kind(&self) -> ErrorKind {
         match self.name.as_str() {
             "unsupported_media_type" => ErrorKind::UnsupportedMediaType,

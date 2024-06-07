@@ -18,7 +18,7 @@ impl Builder {
     /// Creates a new [`Builder`].
     ///
     /// Same as [`Client::builder`].
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         Self {
             api_key: None,
             base_url: None,
@@ -78,7 +78,7 @@ impl Builder {
 
 impl Default for Builder {
     fn default() -> Self {
-        Builder::new()
+        Self::new()
     }
 }
 
@@ -96,18 +96,16 @@ fn default_api_key() -> Option<String> {
     match env::var("GLIDE_API_KEY") {
         Ok(var) => Some(var),
         Err(env::VarError::NotPresent) => None,
-        Err(_) => panic!("env variable `GLIDE_BASE_URL` should be a valid URL"),
+        Err(env::VarError::NotUnicode(_)) => {
+            panic!("env variable `GLIDE_BASE_URL` should be a valid `String`")
+        }
     }
 }
 
 fn default_base_url() -> Url {
-    let url = if let Ok(x) = env::var("GLIDE_BASE_URL") {
-        Url::parse(&x)
-    } else {
-        Url::parse("http://127.0.0.1:9099/")
-    };
-
-    url.expect("env variable `GLIDE_BASE_URL` should be a valid URL")
+    env::var("GLIDE_BASE_URL")
+        .map_or_else(|_| Url::parse("http://127.0.0.1:9099/"), |x| Url::parse(&x))
+        .expect("env variable `GLIDE_BASE_URL` should be a valid `URL`")
 }
 
 fn default_user_agent() -> String {
