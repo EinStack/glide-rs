@@ -161,7 +161,7 @@ impl ChatMessage {
     }
 
     /// Overrides the default [`Role::User`] with [`Role::System`].
-    pub fn with_system(mut self) -> Self {
+    pub const fn with_system(mut self) -> Self {
         self.role = Role::System;
         self
     }

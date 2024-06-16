@@ -4,15 +4,16 @@
 use std::fmt;
 use std::pin::Pin;
 use std::sync::Arc;
-use std::task::{Context, Poll};
+use std::task::{Context, Poll, ready};
 
 use futures::{Sink, SinkExt, Stream, StreamExt};
 use reqwest::Method;
 use reqwest_websocket::{Message, RequestBuilderExt, WebSocket};
+use serde_json::Value;
 
+use crate::{Error, Result};
 use crate::config::Config;
 use crate::language::types::{ChatRequest, ChatResponse, RouterConfigs};
-use crate::{Error, Result};
 
 pub mod types;
 
@@ -21,9 +22,15 @@ pub mod types;
 pub struct Language(pub(crate) Arc<Config>);
 
 impl Language {
-    /// Retrieves a list of all router configs.
+    /// Retrieves a list of all `router` configs.
     ///
     /// `GET /v1/language`
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error`] if the response [`StatusCode`] is not in the 200-299 range.
+    ///
+    /// [`StatusCode`]: reqwest::StatusCode
     pub async fn list(&self) -> Result<RouterConfigs> {
         let request = self.0.create(Method::GET, "/v1/language/");
         let response = self.0.send(request).await?;
@@ -31,9 +38,15 @@ impl Language {
         Ok(content)
     }
 
-    /// Sends a single chat request to a specified router and retrieves the response.
+    /// Sends a single chat request to a specified `router` and retrieves the response.
     ///
     /// `POST /v1/language/{router}/chat`
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error`] if the response [`StatusCode`] is not in the 200-299 range.
+    ///
+    /// [`StatusCode`]: reqwest::StatusCode
     pub async fn chat(&self, router: &str, data: ChatRequest) -> Result<ChatResponse> {
         let path = format!("/v1/language/{router}/chat");
 
@@ -44,9 +57,15 @@ impl Language {
         Ok(content)
     }
 
-    /// Establishes a `WebSocket` connection for streaming chat messages from a specified router.
+    /// Establishes a `WebSocket` connection for streaming chat messages from a specified `router`.
     ///
     /// `GET /v1/language/{router}/chatStream`
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error`] if the response [`StatusCode`] is not in the 200-299 range.
+    ///
+    /// [`StatusCode`]: reqwest::StatusCode
     pub async fn stream(&self, router: &str) -> Result<Chat> {
         let path = format!("/v1/language/{router}/chatStream");
 
@@ -65,25 +84,27 @@ impl fmt::Debug for Language {
     }
 }
 
-/// Streaming chat `WebSocket` connection.
+/// Streaming (`WebSocket`) chat connection.
 ///
 /// Implements `futures::`[`Stream`] and `futures::`[`Sink`].
+#[must_use = "streams do nothing unless you poll them"]
 pub struct Chat {
     inner: WebSocket,
 }
 
 impl Stream for Chat {
-    // TODO: poll::map_ok
-    type Item = Result<Message>;
+    type Item = Result<Value>;
 
     #[inline]
     fn poll_next(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {
-        self.inner.poll_next_unpin(cx).map_err(Into::into)
+        let poll = ready!(self.inner.poll_next_unpin(cx));
+        let next = poll.map(|x| x.and_then(|x| x.json()).map_err(Into::into));
+
+        Poll::Ready(next)
     }
 }
 
-impl Sink<Message> for Chat {
-    // TODO: serde_json::into_string
+impl Sink<Value> for Chat {
     type Error = Error;
 
     #[inline]
@@ -92,7 +113,8 @@ impl Sink<Message> for Chat {
     }
 
     #[inline]
-    fn start_send(mut self: Pin<&mut Self>, item: Message) -> Result<(), Self::Error> {
+    fn start_send(mut self: Pin<&mut Self>, item: Value) -> Result<(), Self::Error> {
+        let item = Message::text_from_json(&item)?;
         self.inner.start_send_unpin(item).map_err(Into::into)
     }
 
@@ -111,8 +133,8 @@ impl Sink<Message> for Chat {
 mod test {
     use futures::StreamExt;
 
-    use crate::language::types::ChatRequest;
     use crate::{Client, Result};
+    use crate::language::types::ChatRequest;
 
     #[tokio::test]
     async fn list() -> Result<()> {
@@ -142,7 +164,7 @@ mod test {
         let router = "myrouter";
         let ws = glide.lang.stream(router).await?;
         let (tx, rx) = ws.split();
-        // TODO: test streaming chat.
+        // TODO: Test streaming chat.
 
         Ok(())
     }

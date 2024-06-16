@@ -1,5 +1,6 @@
 #![forbid(unsafe_code)]
 #![doc = include_str!("../README.md")]
+// #![warn(clippy::all, clippy::pedantic, clippy::nursery, clippy::cargo)]
 
 pub use builder::Builder;
 pub use client::Client;

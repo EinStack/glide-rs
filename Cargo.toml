@@ -24,12 +24,13 @@ native-tls = ["reqwest/native-tls"]
 rustls-tls = ["reqwest/rustls-tls"]
 
 [dependencies]
-reqwest = { version = "0.12.4", default-features = false, features = ["json"] }
-reqwest-websocket = { version = "0.3.0" }
-futures = { version = "0.3.30", default-features = false, features = [] }
-thiserror = { version = "1.0.61" }
-serde = { version = "1.0.203", features = ["derive"] }
-serde_json = { version = "1.0.117" }
+thiserror = { version = "1.0" }
+reqwest = { version = "0.12", default-features = false, features = ["json"] }
+#reqwest-websocket = { version = "0.4", default-features = false, features = ["json"] }
+reqwest-websocket = { git = "https://github.com/jgraef/reqwest-websocket", branch = "main", features = ["json"] }
+futures = { version = "0.3", default-features = false, features = [] }
+serde = { version = "1.0", default-features = false, features = ["derive"] }
+serde_json = { version = "1.0" }
 
 [dev-dependencies]
-tokio = { version = "1.37.0", features = ["macros", "test-util", "rt-multi-thread"] }
+tokio = { version = "1.38.0", features = ["macros", "test-util", "rt-multi-thread"] }

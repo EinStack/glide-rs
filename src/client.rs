@@ -36,7 +36,7 @@ impl Client {
     }
 
     /// Creates a new [`Client`] builder.
-    pub fn builder() -> Builder {
+    pub const fn builder() -> Builder {
         Builder::new()
     }
 
@@ -73,6 +73,13 @@ impl Client {
     /// Returns `true` if the service is healthy.
     ///
     /// `GET /v1/health`
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error`] if the response [`StatusCode`] is not in the 200-299 range.
+    ///
+    /// [`Error`]: crate::Error
+    /// [`StatusCode`]: reqwest::StatusCode
     pub async fn health(&self) -> Result<bool> {
         #[derive(Debug, serde::Deserialize)]
         pub struct Health {
