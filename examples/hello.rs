@@ -8,7 +8,7 @@ async fn main() -> Result<()> {
 
     let list = client.lang.list().await?;
     let router = list.routers.first().unwrap();
-    let name = router.routers.as_str();
+    let name = router["routerID"].as_str().unwrap();
 
     let request = ChatRequest::new("Hello!");
     let response = client.lang.chat(&name, request).await?;
