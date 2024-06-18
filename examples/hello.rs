@@ -1,5 +1,5 @@
-use glide_rs::{Client, Result};
 use glide_rs::lang::chat::ChatRequest;
+use glide_rs::{Client, Result};
 
 #[tokio::main]
 async fn main() -> Result<()> {

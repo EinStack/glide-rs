@@ -3,8 +3,8 @@ use std::sync::Arc;
 
 use reqwest::{Client as RwClient, Method};
 
-use crate::{Builder, Config, Result};
 use crate::lang::Language;
+use crate::{Builder, Config, Result};
 
 /// A minimal [EinStack](https://einstack.ai/) client.
 ///
@@ -31,11 +31,13 @@ impl Client {
     /// Creates a new [`EinStack`] `Glide` client.
     ///
     /// [`EinStack`]: https://www.einstack.ai/
+    #[inline]
     pub fn new() -> Self {
         Builder::new().build()
     }
 
     /// Creates a new [`Client`] builder.
+    #[inline]
     pub const fn builder() -> Builder {
         Builder::new()
     }
@@ -102,12 +104,14 @@ impl Default for Client {
     /// - Panics if the environment variable `GLIDE_API_KEY` is set but is not a valid `String`.
     /// - Panics if the environment variable `GLIDE_BASE_URL` is set but is not a valid `URL`.
     /// - Panics if the environment variable `GLIDE_USER_AGENT` is set but is not a valid `String`.
+    #[inline]
     fn default() -> Self {
         Self::builder().build()
     }
 }
 
 impl fmt::Debug for Client {
+    #[inline]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         fmt::Debug::fmt(&self.config, f)
     }
@@ -118,7 +122,7 @@ mod test {
     use crate::{Client, Result};
 
     #[test]
-    fn create() -> Result<()> {
+    fn build() -> Result<()> {
         let _ = Client::new();
         let _ = Client::builder().build();
         let _ = Client::default();

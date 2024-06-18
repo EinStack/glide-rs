@@ -3,6 +3,7 @@ use serde::Deserialize;
 use thiserror::Error;
 
 /// List specifying general categories of [`ErrorResponse`]s.
+#[must_use]
 #[derive(Debug, Copy, Clone)]
 pub enum ErrorKind {
     /// Error name is not a part of the implemented `API` spec.
@@ -31,7 +32,6 @@ pub struct ErrorResponse {
 
 impl ErrorResponse {
     /// Returns the [`ErrorKind`].
-    #[must_use]
     pub fn kind(&self) -> ErrorKind {
         match self.name.as_str() {
             "unsupported_media_type" => ErrorKind::UnsupportedMediaType,

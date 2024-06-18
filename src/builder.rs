@@ -6,7 +6,6 @@ use crate::{Client, Config};
 
 /// [`Client`] builder.
 #[must_use]
-#[derive(Clone)]
 pub struct Builder {
     api_key: Option<String>,
     base_url: Option<Url>,
@@ -77,6 +76,7 @@ impl Builder {
 }
 
 impl Default for Builder {
+    #[inline]
     fn default() -> Self {
         Self::new()
     }

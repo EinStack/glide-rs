@@ -20,6 +20,7 @@ pub mod types {
 }
 
 /// Error type for a [`Client`].
+#[must_use]
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
     /// Errors that may occur during the processing of an HTTP request.
