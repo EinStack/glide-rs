@@ -52,6 +52,14 @@ pub struct ChatResponse {
     pub router_id: String,
 }
 
+impl ChatResponse {
+    /// Returns the reference to the model response.
+    #[inline]
+    pub fn content(&self) -> &str {
+        &self.model_response.message.content
+    }
+}
+
 /// Unified response from the provider.
 #[derive(Debug, Deserialize)]
 pub struct ModelResponse {

@@ -12,8 +12,7 @@ async fn main() -> Result<()> {
 
     let request = ChatRequest::new("Hello!");
     let response = client.lang.chat(&name, request).await?;
-    let content = response.model_response.message.content;
-    println!("response: {content}");
+    println!("response: {}", response.content());
 
     Ok(())
 }
