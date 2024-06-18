@@ -12,10 +12,12 @@ use reqwest_websocket::{Message, RequestBuilderExt, WebSocket};
 use serde_json::Value;
 
 use crate::config::Config;
-use crate::language::types::{ChatRequest, ChatResponse, RouterConfigs};
+use crate::language::chat::{ChatRequest, ChatResponse};
+use crate::language::list::RouterConfigs;
 use crate::{Error, Result};
 
-pub mod types;
+pub mod chat;
+pub mod list;
 
 /// APIs for `/v1/language` endpoints.
 #[derive(Clone)]
@@ -131,7 +133,7 @@ impl Sink<Value> for Chat {
 
 #[cfg(test)]
 mod test {
-    use crate::language::types::ChatRequest;
+    use crate::language::chat::ChatRequest;
     use crate::{Client, Result};
 
     #[tokio::test]

@@ -34,3 +34,7 @@ serde_json = { version = "1.0" }
 
 [dev-dependencies]
 tokio = { version = "1.38", features = ["macros", "rt-multi-thread"] }
+
+[[example]]
+name = "hello"
+path = "examples/hello.rs"

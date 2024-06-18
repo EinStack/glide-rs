@@ -26,14 +26,21 @@ cargo add glide-rs
 
 ## Usage
 
+For a full example take a look at [`hello.rs`](examples/hello.rs).
+
 ```rust
 use glide_rs::{Client, Result};
+use glide_rs::language::chat::ChatRequest;
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    let glide = Client::default();
-    glide.health().await?;
-    let _ = glide.language.list().await?;
+    let client = Client::default();
+
+    let request = ChatRequest::new("Hello!");
+    let response = client.lang.chat("myrouter", request).await?;
+    let content = response.model_response.message.content;
+    println!("response: {content}");
+
     Ok(())
 }
 ```
