@@ -10,7 +10,7 @@ mod builder;
 mod client;
 mod config;
 mod error;
-pub mod language;
+pub mod lang;
 
 pub mod types {
     //! Request and response types.

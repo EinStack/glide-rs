@@ -1,11 +1,11 @@
 use glide_rs::{Client, Result};
-use glide_rs::language::chat::ChatRequest;
+use glide_rs::lang::chat::ChatRequest;
 
 #[tokio::main]
 async fn main() -> Result<()> {
     let client = Client::default();
     client.health().await?;
-    
+
     let list = client.lang.list().await?;
     let router = list.routers.first().unwrap();
     let name = router.routers.as_str();
