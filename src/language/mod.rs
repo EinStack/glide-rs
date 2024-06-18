@@ -4,16 +4,16 @@
 use std::fmt;
 use std::pin::Pin;
 use std::sync::Arc;
-use std::task::{Context, Poll, ready};
+use std::task::{ready, Context, Poll};
 
 use futures::{Sink, SinkExt, Stream, StreamExt};
 use reqwest::Method;
 use reqwest_websocket::{Message, RequestBuilderExt, WebSocket};
 use serde_json::Value;
 
-use crate::{Error, Result};
 use crate::config::Config;
 use crate::language::types::{ChatRequest, ChatResponse, RouterConfigs};
+use crate::{Error, Result};
 
 pub mod types;
 
@@ -131,17 +131,14 @@ impl Sink<Value> for Chat {
 
 #[cfg(test)]
 mod test {
-    use futures::StreamExt;
-
-    use crate::{Client, Result};
     use crate::language::types::ChatRequest;
+    use crate::{Client, Result};
 
     #[tokio::test]
     async fn list() -> Result<()> {
         let glide = Client::default();
         let response = glide.lang.list().await?;
-        assert_eq!(response.len(), 1);
-        dbg!(&response[0]);
+        assert!(response.routers.len() > 0);
 
         Ok(())
     }
@@ -162,8 +159,8 @@ mod test {
         let glide = Client::default();
 
         let router = "myrouter";
-        let ws = glide.lang.stream(router).await?;
-        let (tx, rx) = ws.split();
+        let _ws = glide.lang.stream(router).await?;
+        // let (tx, rx) = ws.split();
         // TODO: Test streaming chat.
 
         Ok(())
