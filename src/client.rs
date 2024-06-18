@@ -132,7 +132,8 @@ mod test {
     #[tokio::test]
     async fn health() -> Result<()> {
         let glide = Client::default();
-        assert!(glide.health().await.is_ok());
+        let healthy = glide.health().await?;
+        assert!(healthy);
         Ok(())
     }
 }

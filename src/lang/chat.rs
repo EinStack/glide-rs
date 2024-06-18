@@ -14,7 +14,7 @@ pub struct ChatRequest {
     #[serde(rename = "message_history", skip_serializing_if = "Option::is_none")]
     pub message_history: Option<Vec<ChatMessage>>,
     #[serde(rename = "override_params", skip_serializing_if = "Option::is_none")]
-    pub override_params: Option<ChatRequestOverride>,
+    pub override_params: Option<HashMap<String, ChatRequestOverride>>,
 }
 
 impl ChatRequest {
@@ -91,7 +91,7 @@ pub struct ChatMessage {
     /// The role of the author of this message.
     ///
     /// One of system, user, or assistant.
-    pub role: Role,
+    pub role: Option<Role>,
 }
 
 impl ChatMessage {
@@ -100,13 +100,13 @@ impl ChatMessage {
         Self {
             content: content.to_owned(),
             name: None,
-            role: Role::User,
+            role: None,
         }
     }
 
     /// Overrides the default [`Role::User`] with [`Role::System`].
     pub const fn with_system(mut self) -> Self {
-        self.role = Role::System;
+        self.role = Some(Role::System);
         self
     }
 }
@@ -143,6 +143,4 @@ pub enum Role {
 pub struct ChatRequestOverride {
     #[serde(rename = "message")]
     pub message: ChatMessage,
-    #[serde(rename = "model_id")]
-    pub model_id: String,
 }

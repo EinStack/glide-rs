@@ -10,3 +10,6 @@ pub struct RouterConfigs {
     /// List of all available routers.
     pub routers: Vec<Value>,
 }
+
+/// Single router configuration.
+pub type RouterConfig = Value;
