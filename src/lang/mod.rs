@@ -4,17 +4,17 @@
 use std::fmt;
 use std::pin::Pin;
 use std::sync::Arc;
-use std::task::{Context, Poll, ready};
+use std::task::{ready, Context, Poll};
 
 use futures::{Sink, SinkExt, Stream, StreamExt, TryFutureExt};
 use reqwest::Method;
 use reqwest_websocket::{CloseCode, Message, RequestBuilderExt, WebSocket};
 use serde_json::Value;
 
-use crate::{Error, Result};
 use crate::config::Config;
 use crate::lang::chat::{ChatRequest, ChatResponse};
 use crate::lang::list::RouterConfigs;
+use crate::{Error, Result};
 
 pub mod chat;
 pub mod list;
@@ -141,8 +141,8 @@ impl Sink<Value> for Chat {
 
 #[cfg(test)]
 mod test {
-    use crate::{Client, Result};
     use crate::lang::chat::ChatRequest;
+    use crate::{Client, Result};
 
     #[tokio::test]
     async fn list() -> Result<()> {
