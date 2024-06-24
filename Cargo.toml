@@ -18,19 +18,25 @@ categories = ["web-programming"]
 keywords = ["ai", "llm", "gateway"]
 description = "A minimal EinStack client."
 
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
 [features]
 default = ["native-tls"]
 native-tls = ["reqwest/native-tls"]
 rustls-tls = ["reqwest/rustls-tls"]
+streaming = ["dep:reqwest-websocket", "dep:futures"]
 
 [dependencies]
 thiserror = { version = "1.0" }
 reqwest = { version = "0.12", default-features = false, features = ["json"] }
-#reqwest-websocket = { version = "0.4", default-features = false, features = ["json"] }
-reqwest-websocket = { git = "https://github.com/jgraef/reqwest-websocket", branch = "main", features = ["json"] }
-futures = { version = "0.3", default-features = false, features = [] }
 serde = { version = "1.0", default-features = false, features = ["derive"] }
-serde_json = { version = "1.0" }
+serde_json = { version = "1.0", features = [] }
+
+#reqwest-websocket = { version = "0.4", default-features = false, optional = true, features = ["json"] }
+reqwest-websocket = { git = "https://github.com/jgraef/reqwest-websocket", optional = true, branch = "main", features = ["json"] }
+futures = { version = "0.3", default-features = false, optional = true, features = [] }
 
 [dev-dependencies]
 tokio = { version = "1.38", features = ["macros", "rt-multi-thread"] }
