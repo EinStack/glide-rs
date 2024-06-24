@@ -1,20 +1,30 @@
-.idea
+# OS
+Thumbs.db
 .DS_Store
+*.pdb
 
-# Added by cargo
+# Editors
+.vs/
+.vscode/
+.idea/
+.fleet/
 
-/target
+# Lang: Rust
+debug/
+target/
+Cargo.lock
+**/*.rs.bk
 
+# Output
+dist/
+build/
 
-# Added by cargo
-#
-# already existing elements were commented out
+# Environment
+env/
+.env
+.env*
 
-#/target
-
-
-# Added by cargo
-#
-# already existing elements were commented out
-
-#/target
+# Logs
+logs/
+*.log
+*.log*

@@ -9,20 +9,38 @@
 
 ---
 
-> [!Warning]
 > Glide is under active development right now 🛠️
 
-> [!Important]
-> Give us a star⭐ to support the project and watch👀 our repositories not to miss any update
+> Give us a star ⭐ to support the project and watch 👀 our repositories not to miss any update
 
 ## Features
 
-TBU
+- `native-tls` to use system-native TLS. **Enabled by default**.
+- `rustls-tls` to use TLS backed by rustls .
 
 ## Installation
 
-Coming soon
+```cmd
+cargo add glide-rs
+```
 
 ## Usage
 
-Coming soon
+For a full example take a look at [`hello.rs`](examples/hello.rs).
+
+```rust
+use glide_rs::{Client, Result};
+use glide_rs::language::chat::ChatRequest;
+
+#[tokio::main]
+async fn main() -> Result<()> {
+    let client = Client::default();
+
+    let request = ChatRequest::new("Hello!");
+    let response = client.lang.chat("myrouter", request).await?;
+    let content = response.model_response.message.content;
+    println!("response: {content}");
+
+    Ok(())
+}
+```
