@@ -2,22 +2,23 @@
 //!
 
 use std::fmt;
-use std::pin::Pin;
 use std::sync::Arc;
-use std::task::{ready, Context, Poll};
 
-use futures::{Sink, SinkExt, Stream, StreamExt, TryFutureExt};
 use reqwest::Method;
-use reqwest_websocket::{CloseCode, Message, RequestBuilderExt, WebSocket};
-use serde_json::Value;
 
 use crate::config::Config;
 use crate::lang::chat::{ChatRequest, ChatResponse};
 use crate::lang::list::RouterConfigs;
-use crate::{Error, Result};
+#[cfg(feature = "streaming")]
+#[cfg_attr(docsrs, doc(cfg(feature = "streaming")))]
+pub use crate::lang::stream::Chat;
+use crate::Result;
 
 pub mod chat;
 pub mod list;
+
+#[cfg(feature = "streaming")]
+mod stream;
 
 /// APIs for `/v1/language` endpoints.
 #[derive(Clone)]
@@ -32,6 +33,7 @@ impl Language {
     ///
     /// Returns an [`Error`] if the response [`StatusCode`] is not in the 200-299 range.
     ///
+    /// [`Error`]: crate::Error
     /// [`StatusCode`]: reqwest::StatusCode
     pub async fn list(&self) -> Result<RouterConfigs> {
         let request = self.0.create(Method::GET, "/v1/language/");
@@ -48,6 +50,7 @@ impl Language {
     ///
     /// Returns an [`Error`] if the response [`StatusCode`] is not in the 200-299 range.
     ///
+    /// [`Error`]: crate::Error
     /// [`StatusCode`]: reqwest::StatusCode
     pub async fn chat(&self, router: &str, data: ChatRequest) -> Result<ChatResponse> {
         let path = format!("/v1/language/{router}/chat");
@@ -67,15 +70,19 @@ impl Language {
     ///
     /// Returns an [`Error`] if the response [`StatusCode`] is not in the 200-299 range.
     ///
+    /// [`Error`]: crate::Error
     /// [`StatusCode`]: reqwest::StatusCode
+    #[cfg(feature = "streaming")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "streaming")))]
     pub async fn stream(&self, router: &str) -> Result<Chat> {
+        use reqwest_websocket::RequestBuilderExt as _;
         let path = format!("/v1/language/{router}/chatStream");
 
         let request = self.0.create(Method::GET, &path).upgrade();
         let response = request.send().await?;
         let websocket = response.into_websocket().await?;
 
-        Ok(Chat { inner: websocket })
+        Ok(Chat::new(websocket))
     }
 }
 
@@ -83,59 +90,6 @@ impl fmt::Debug for Language {
     #[inline]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         fmt::Debug::fmt(&self.0, f)
-    }
-}
-
-/// Streaming (`WebSocket`) chat connection.
-///
-/// Implements `futures::`[`Stream`] and `futures::`[`Sink`].
-#[must_use = "streams do nothing unless you poll them"]
-pub struct Chat {
-    inner: WebSocket,
-}
-
-impl Chat {
-    /// Closes the underlying connection after sending [`CloseCode::Away`].
-    pub async fn close(self) -> Result<()> {
-        let response = self.inner.close(CloseCode::Away, None).await;
-        response.map_err(Into::into)
-    }
-}
-
-impl Stream for Chat {
-    type Item = Result<Value>;
-
-    #[inline]
-    fn poll_next(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {
-        let poll = ready!(self.inner.poll_next_unpin(cx));
-        let next = poll.map(|x| x.and_then(|x| x.json()).map_err(Into::into));
-
-        Poll::Ready(next)
-    }
-}
-
-impl Sink<Value> for Chat {
-    type Error = Error;
-
-    #[inline]
-    fn poll_ready(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Result<(), Self::Error>> {
-        self.inner.poll_ready_unpin(cx).map_err(Into::into)
-    }
-
-    #[inline]
-    fn start_send(mut self: Pin<&mut Self>, item: Value) -> Result<(), Self::Error> {
-        let item = Message::text_from_json(&item)?;
-        self.inner.start_send_unpin(item).map_err(Into::into)
-    }
-
-    #[inline]
-    fn poll_flush(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Result<(), Self::Error>> {
-        self.inner.poll_flush_unpin(cx).map_err(Into::into)
-    }
-
-    #[inline]
-    fn poll_close(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Result<(), Self::Error>> {
-        self.inner.poll_close_unpin(cx).map_err(Into::into)
     }
 }
 
@@ -165,6 +119,7 @@ mod test {
     }
 
     #[tokio::test]
+    #[cfg(feature = "streaming")]
     async fn stream() -> Result<()> {
         let glide = Client::default();
 
