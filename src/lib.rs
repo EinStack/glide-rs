@@ -1,4 +1,5 @@
 #![forbid(unsafe_code)]
+#![cfg_attr(docsrs, feature(doc_cfg))]
 #![doc = include_str!("../README.md")]
 
 pub use builder::Builder;
@@ -27,6 +28,8 @@ pub enum Error {
     Http(#[from] reqwest::Error),
 
     /// Errors that may occur during the processing of a WS request.
+    #[cfg(feature = "streaming")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "streaming")))]
     #[error("websocket error: {0}")]
     Ws(#[from] reqwest_websocket::Error),
 
