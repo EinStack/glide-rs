@@ -27,7 +27,7 @@ rustls-tls = ["reqwest/rustls-tls"]
 thiserror = { version = "1.0" }
 reqwest = { version = "0.12", default-features = false, features = ["json"] }
 #reqwest-websocket = { version = "0.4", default-features = false, features = ["json"] }
-reqwest-websocket = { git = "https://github.com/jgraef/reqwest-websocket", branch = "main", features = ["json"] }
+reqwest-websocket = { git = "https://github.com/jgraef/reqwest-websocket", version = "0.4", optional = true, branch = "main", features = ["json"] }
 futures = { version = "0.3", default-features = false, features = [] }
 serde = { version = "1.0", default-features = false, features = ["derive"] }
 serde_json = { version = "1.0" }
