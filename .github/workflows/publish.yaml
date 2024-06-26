@@ -27,7 +27,7 @@ jobs:
         run: cargo install cargo-semver-checks --locked
 
       - name: Run Cargo:semver
-        run: cargo semver-checks check-release
+        run: cargo semver-checks check-release --baseline-root .
 
       - name: Publish to crates.io
         run: cargo publish --token ${CRATES_TOKEN}
